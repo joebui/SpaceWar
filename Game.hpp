@@ -37,8 +37,11 @@ public:
             }
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+            // Spawn new monster.
             spawnMonsters(monsters, window, monsterTexture);
+            // Check missile collion with monsters.
             ship.checkCollision(monsters);
+            // Control ship movement.
             ship.controlMovement(window);
 
             window.draw(ship.getSprite());
@@ -47,6 +50,7 @@ public:
     }
 
     void spawnMonsters(vector<Monster> &monsters, RenderWindow &window, Texture &texture) {
+        // Spawn monster every 1s.
         Time elapsed = clock.getElapsedTime();
         if (elapsed.asSeconds() >= 1) {
             Monster monster;
@@ -56,6 +60,7 @@ public:
             clock.restart();
         }
 
+        // Remove monster going out of the screen boundary.
         for (int i = 0; i < monsters.size(); ++i) {
             if (monsters[i].getX() >= 1024) {
                 monsters.erase(monsters.begin() + i);

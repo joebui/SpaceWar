@@ -65,6 +65,7 @@ public:
     }
 
     void fire(RenderWindow &window) {
+        // Fire missiles.
         for (unsigned int i = 0; i < missiles.size(); ++i) {
             if (missiles[i].getY() < 0) {
                 missiles.erase(missiles.begin() + i);
@@ -77,6 +78,7 @@ public:
     }
 
     void checkCollision(vector<Monster> &monsters) {
+        // Check collision with monsters.
         for (int i = 0; i < monsters.size(); ++i) {
             for (int j = 0; j < missiles.size(); ++j) {
                 if (monsters[i].checkIntersection(missiles[j].getBounding())) {
