@@ -58,7 +58,8 @@ public:
 
         for (int i = 0; i < monsters.size(); ++i) {
             if (monsters[i].getX() >= 1024) {
-                monsters.erase(monsters.begin() + i - 1);
+                monsters.erase(monsters.begin() + i);
+                cout << "Monster removed" << endl;
             } else {
                 monsters[i].move();
                 window.draw(monsters[i].getSprite(texture));

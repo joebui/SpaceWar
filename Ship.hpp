@@ -67,7 +67,8 @@ public:
     void fire(RenderWindow &window) {
         for (unsigned int i = 0; i < missiles.size(); ++i) {
             if (missiles[i].getY() < 0) {
-                missiles.erase(missiles.begin() + i - 1);
+                missiles.erase(missiles.begin() + i);
+                cout << "Missile removed" << endl;
             } else {
                 missiles[i].fire();
                 window.draw(missiles[i].getSprite(missileTexture));
@@ -80,11 +81,10 @@ public:
             for (int j = 0; j < missiles.size(); ++j) {
                 if (monsters[i].checkIntersection(missiles[j].getBounding())) {
                     monsters[i].reduceHealth();
-                    cout << monsters[i].getHealth() << endl;
                     if (monsters[i].getHealth() <= 0)
                         monsters[i].setX(1024);
 
-                    missiles[j].setY(0);
+                    missiles[j].setY(-10);
                 }
             }
         }
