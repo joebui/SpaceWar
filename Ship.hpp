@@ -17,6 +17,7 @@ private:
     FloatRect bounding;
     vector<Missile> missiles;
     int x, y;
+    bool isDead;
     Clock clock;
 
 public:
@@ -27,9 +28,11 @@ public:
         missileTexture.setSmooth(true);
 
         sprite.setTexture(shipTexture);
+        bounding = sprite.getGlobalBounds();
 
         x = 1024 / 2;
         y = 630;
+        isDead = false;
         sprite.setPosition(x, y);
     }
 
@@ -69,7 +72,6 @@ public:
         for (unsigned int i = 0; i < missiles.size(); ++i) {
             if (missiles[i].getY() < 0) {
                 missiles.erase(missiles.begin() + i);
-                cout << "Missile removed" << endl;
             } else {
                 missiles[i].fire();
                 window.draw(missiles[i].getSprite(missileTexture));
@@ -77,7 +79,7 @@ public:
         }
     }
 
-    void checkCollision(vector<Monster> &monsters) {
+    void checkBulletMonsterCollision(vector<Monster> &monsters) {
         // Check collision with monsters.
         for (int i = 0; i < monsters.size(); ++i) {
             for (int j = 0; j < missiles.size(); ++j) {
@@ -92,8 +94,25 @@ public:
         }
     }
 
-    const Sprite &getSprite() const {
+    void checkLazerPlayerCollision(vector<Lazer1> &lazers) {
+        // Check lazer collision with ship.
+        for (int i = 0; i < lazers.size(); ++i) {
+            if (bounding.intersects(lazers[i].getBounding())) {
+                cout << "Hit player" << endl;
+                lazers[i].setY(-10);
+                isDead = true;
+            }
+        }
+    }
+
+    const Sprite &getSprite() {
+        sprite.setTexture(shipTexture);
+        bounding = sprite.getGlobalBounds();
         return sprite;
+    }
+
+    bool isIsDead() const {
+        return isDead;
     }
 };
 

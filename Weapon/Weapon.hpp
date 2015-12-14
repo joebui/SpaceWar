@@ -15,8 +15,8 @@ protected:
 public:
     virtual void fire() {}
 
-    const Sprite &getSprite(Texture &missileTexture) {
-        sprite.setTexture(missileTexture);
+    const Sprite &getSprite(Texture &texture) {
+        sprite.setTexture(texture);
         bounding = sprite.getGlobalBounds();
         return sprite;
     }

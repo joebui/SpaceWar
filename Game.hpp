@@ -13,12 +13,16 @@ private:
     Ship ship;
     Clock clock;
     Texture monsterTexture;
+    Texture lazer;
     vector<Monster> monsters;
+    vector<Lazer1> weapons;
 
 public:
     Game() {
         monsterTexture.loadFromFile("Monster1 2 HP.png");
         monsterTexture.setSmooth(true);
+        lazer.loadFromFile("lazer.png");
+        lazer.setSmooth(true);
     }
 
     void run() {
@@ -37,14 +41,17 @@ public:
             }
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            // Spawn new monster.
-            spawnMonsters(monsters, window, monsterTexture);
-            // Check missile collion with monsters.
-            ship.checkCollision(monsters);
+            // Run game until player dies.
+            if (!ship.isIsDead()) {
+                ship.controlMovement(window);
+                window.draw(ship.getSprite());
+                // Spawn new monster.
+                spawnMonsters(monsters, window, monsterTexture);
+                // Check missile collion with monsters.
+                ship.checkBulletMonsterCollision(monsters);
+                ship.checkLazerPlayerCollision(weapons);
+            }
             // Control ship movement.
-            ship.controlMovement(window);
-
-            window.draw(ship.getSprite());
             window.display();
         }
     }
@@ -55,8 +62,6 @@ public:
         if (elapsed.asSeconds() >= 1) {
             Monster monster;
             monsters.push_back(monster);
-//            Thread t (&Monster::fireBullet, &monster);
-//            t.launch();
             clock.restart();
         }
 
@@ -64,24 +69,22 @@ public:
         for (int i = 0; i < monsters.size(); ++i) {
             if (monsters[i].getX() >= 1024) {
                 monsters.erase(monsters.begin() + i);
-                cout << "Monster removed" << endl;
             } else {
                 monsters[i].move();
+                monsters[i].fireBullet(weapons);
                 window.draw(monsters[i].getSprite(texture));
             }
-//
-//            for (unsigned int i = 0; i < monsters[i].getWeapons().size(); ++i) {
-//                if (monsters[i].getWeapons()[i].getY() > 720) {
-//                    monsters[i].getWeapons().erase(monsters[i].getWeapons().begin() + i - 1);
-//                } else {
-//                    monsters[i].getWeapons()[i].fire();
-//                    window.draw(monsters[i].getWeapons()[i].getSprite(texture));
-//                }
-//            }
+        }
+
+        for (unsigned int i = 0; i < weapons.size(); ++i) {
+            if (weapons[i].getY() > 720) {
+                weapons.erase(weapons.begin() + i);
+            } else {
+                weapons[i].fire();
+                window.draw(weapons[i].getSprite(lazer));
+            }
         }
     }
-
-
 };
 
 #endif //COSC2131_PROJECT_S3445846_S3372771_GAME_HPP

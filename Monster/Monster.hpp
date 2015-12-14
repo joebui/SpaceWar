@@ -14,8 +14,7 @@ private:
     // Weapon texture.
     Texture texture;
     FloatRect bounding;
-    vector<Weapon> weapons;
-//    Clock fireClock;
+    Clock fireClock;
     int x;
     int y;
     int health;
@@ -44,16 +43,14 @@ public:
         return bounding.intersects(r);
     }
 
-//    void fireBullet() {
-//        while (true) {
-//            Time fire = fireClock.getElapsedTime();
-//            if (fire.asSeconds() >= 2) {
-//                Weapon *lazer1 = new Lazer1(x, y, texture.getSize().x, texture.getSize().y);
-//                weapons.push_back(*lazer1);
-//                fireClock.restart();
-//            }
-//        }
-//    }
+    void fireBullet(vector<Lazer1> &weapons) {
+        Time fire = fireClock.getElapsedTime();
+        if (fire.asSeconds() >= 1) {
+            Lazer1 lazer1 (x, y, texture.getSize().x, texture.getSize().y);
+            weapons.push_back(lazer1);
+            fireClock.restart();
+        }
+    }
 
     int getX() const {
         return x;
@@ -61,10 +58,6 @@ public:
 
     void setX(int x) {
         Monster::x = x;
-    }
-
-    vector<Weapon> &getWeapons() {
-        return weapons;
     }
 
     int getHealth() const {
