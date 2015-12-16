@@ -5,6 +5,7 @@
 #include <SFML/OpenGL.hpp>
 #include "Ship.hpp"
 #include "Monster/Monster.hpp"
+#include "Level.h"
 
 using namespace sf;
 
@@ -12,17 +13,36 @@ class Game {
 private:
     Ship ship;
     Clock clock;
-    Texture monsterTexture;
-    Texture lazer;
+    Texture monsterTexture1;
+    Texture mobLazer1;
+    Texture monsterTexture2;
+    Texture mobLazer2;
+    Texture monsterTexture3;
+    Texture mobLazer3;
     vector<Monster> monsters;
+    vector<int> spawnMonsters;
+    int monsterSize;
     vector<Lazer1> weapons;
-
+    Clock levelClock;
+    Level level;
+    int curLevel = 1;
+    bool changeLevel = false;
 public:
     Game() {
-        monsterTexture.loadFromFile("Monster1 2 HP.png");
-        monsterTexture.setSmooth(true);
-        lazer.loadFromFile("lazer.png");
-        lazer.setSmooth(true);
+        monsterTexture1.loadFromFile("Monster1 1 HP.png");
+        monsterTexture1.setSmooth(true);
+        mobLazer1.loadFromFile("lazer1.png");
+        mobLazer1.setSmooth(true);
+
+        monsterTexture2.loadFromFile("Monster2 2 HP.png");
+        monsterTexture2.setSmooth(true);
+        mobLazer2.loadFromFile("lazer2.png");
+        mobLazer2.setSmooth(true);
+
+        monsterTexture3.loadFromFile("Monster3 3 HP.png");
+        monsterTexture3.setSmooth(true);
+        mobLazer3.loadFromFile("lazer3.png");
+        mobLazer3.setSmooth(true);
     }
 
     void run() {
@@ -43,10 +63,25 @@ public:
 
             // Run game until player dies.
             if (!ship.isIsDead()) {
+
+                // Change Level
+                Time elapsed = clock.getElapsedTime();
+                if(elapsed.asSeconds () == 90){
+                    curLevel += 1;
+                    changeLevel = true;
+                }
+
+                // check for spawnMonster vector size
+                if(spawnMonsters.size() == 0 || changeLevel){
+                    level.addMonster(spawnMonsters, curLevel);
+                    changeLevel = false;
+                }
+
                 ship.controlMovement(window);
                 window.draw(ship.getSprite());
                 // Spawn new monster.
-                spawnMonsters(monsters, window, monsterTexture);
+                spawnMonsters(monsters, window, spawnMonsters.push_back());
+                spawnMonsters.pop_back();
                 // Check missile collion with monsters.
                 ship.checkBulletMonsterCollision(monsters);
                 ship.checkLazerPlayerCollision(weapons);
@@ -56,11 +91,12 @@ public:
         }
     }
 
-    void spawnMonsters(vector<Monster> &monsters, RenderWindow &window, Texture &texture) {
+    void spawnMonsters(vector<Monster> &monsters, RenderWindow &window, int type) {
         // Spawn monster every 1s.
         Time elapsed = clock.getElapsedTime();
-        if (elapsed.asSeconds() >= 1) {
-            Monster monster;
+        float monsterSpawnTime = 5 / monsterSize * 1000;
+        if (elapsed.asMilliseconds () >= monsterSpawnTime) {
+            Monster monster(type);
             monsters.push_back(monster);
             clock.restart();
         }
@@ -72,7 +108,7 @@ public:
             } else {
                 monsters[i].move();
                 monsters[i].fireBullet(weapons);
-                window.draw(monsters[i].getSprite(texture));
+                window.draw(monsters[i].getSprite(getTexture(type, 1)));
             }
         }
 
@@ -81,7 +117,30 @@ public:
                 weapons.erase(weapons.begin() + i);
             } else {
                 weapons[i].fire();
-                window.draw(weapons[i].getSprite(lazer));
+                window.draw(weapons[i].getSprite(getTexture(type, 0)));
+            }
+        }
+    }
+
+    Texture getTexture(int type, int mobOrLazer){
+        // mobOrLazer == 1 -> is mob
+        if(mobOrLazer == 1){
+            switch (type){
+                case 1:
+                    return monsterTexture1;
+                case 2:
+                    return monsterTexture2;
+                case 3:
+                    return monsterTexture3;
+            }
+        } else {
+            switch (type){
+                case 1:
+                    return mobLazer1;
+                case 2:
+                    return mobLazer2;
+                case 3:
+                    return mobLazer3;
             }
         }
     }

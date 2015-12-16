@@ -18,11 +18,36 @@ private:
     int x;
     int y;
     int health;
+    int type;
 
 public:
     Monster() {
-        texture.loadFromFile("lazer.png");
+        texture.loadFromFile("lazer1.png");
         texture.setSmooth(true);
+        x = 0;
+        y = rand() % 300;
+        health = 1;
+
+        sprite.setPosition(x, y);
+    }
+
+    Monster(int type): type{type}{
+        switch (type){
+            case 1:
+                texture.loadFromFile("lazer1.png");
+                texture.setSmooth(true);
+                break;
+            case 2:
+                texture.loadFromFile("lazer2.png");
+                texture.setSmooth(true);
+                break;
+            case 3:
+                texture.loadFromFile("lazer3.png");
+                texture.setSmooth(true);
+                break;
+        }
+
+
         x = 0;
         y = rand() % 300;
         health = 1;
