@@ -11,6 +11,7 @@ protected:
     Sprite sprite;
     FloatRect bounding;
     int x, y;
+    int type;
 
 public:
     virtual void fire() {}
@@ -27,6 +28,10 @@ public:
 
     void setY(int y) {
         Weapon::y = y;
+    }
+
+    int getType() const {
+        return type;
     }
 
     const FloatRect &getBounding() const {

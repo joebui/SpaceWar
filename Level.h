@@ -20,6 +20,7 @@ public:
                 for (int i = 0; i < 5; i++) {
                     spawnMonsters.push_back(1);
                 }
+
                 break;
 
             case 2:

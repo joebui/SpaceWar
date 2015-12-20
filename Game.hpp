@@ -1,6 +1,8 @@
 #ifndef COSC2131_PROJECT_S3445846_S3372771_GAME_HPP
 #define COSC2131_PROJECT_S3445846_S3372771_GAME_HPP
 
+#include <SFML/System.hpp>
+#include <vector>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include "Ship.hpp"
@@ -20,7 +22,7 @@ private:
     Texture monsterTexture3;
     Texture mobLazer3;
     vector<Monster> monsters;
-    vector<int> spawnMonsters;
+    vector<int> spawnMonstersList;
     int monsterSize;
     vector<Lazer1> weapons;
     Clock levelClock;
@@ -65,23 +67,30 @@ public:
             if (!ship.isIsDead()) {
 
                 // Change Level
-                Time elapsed = clock.getElapsedTime();
-                if(elapsed.asSeconds () == 90){
+                Time levelElapsed = levelClock.getElapsedTime();
+                if(levelElapsed.asSeconds () >= 10){
+
                     curLevel += 1;
                     changeLevel = true;
+                    cout <<  curLevel <<" ";
+                    levelClock.restart();
                 }
 
                 // check for spawnMonster vector size
-                if(spawnMonsters.size() == 0 || changeLevel){
-                    level.addMonster(spawnMonsters, curLevel);
+                if(spawnMonstersList.size() == 0 || changeLevel){
+                    level.addMonster(spawnMonstersList, curLevel);
+                    monsterSize = spawnMonstersList.size();
                     changeLevel = false;
                 }
 
                 ship.controlMovement(window);
                 window.draw(ship.getSprite());
                 // Spawn new monster.
-                spawnMonsters(monsters, window, spawnMonsters.push_back());
-                spawnMonsters.pop_back();
+
+                if(spawnMonstersList.size() != 0){
+                    spawnMonsters(monsters, window, spawnMonstersList.at(spawnMonstersList.size() -1 ));
+                    spawnMonstersList.pop_back();
+                }
                 // Check missile collion with monsters.
                 ship.checkBulletMonsterCollision(monsters);
                 ship.checkLazerPlayerCollision(weapons);
@@ -94,7 +103,7 @@ public:
     void spawnMonsters(vector<Monster> &monsters, RenderWindow &window, int type) {
         // Spawn monster every 1s.
         Time elapsed = clock.getElapsedTime();
-        float monsterSpawnTime = 5 / monsterSize * 1000;
+        float monsterSpawnTime = 10 / monsterSize * 1000;
         if (elapsed.asMilliseconds () >= monsterSpawnTime) {
             Monster monster(type);
             monsters.push_back(monster);
@@ -108,7 +117,18 @@ public:
             } else {
                 monsters[i].move();
                 monsters[i].fireBullet(weapons);
-                window.draw(monsters[i].getSprite(getTexture(type, 1)));
+
+                switch (monsters[i].getType()){
+                    case 1:
+                        window.draw(monsters[i].getSprite(monsterTexture1));
+                        break;
+                    case 2:
+                        window.draw(monsters[i].getSprite(monsterTexture2));
+                        break;
+                    case 3:
+                        window.draw(monsters[i].getSprite(monsterTexture3));
+                        break;
+                }
             }
         }
 
@@ -117,33 +137,25 @@ public:
                 weapons.erase(weapons.begin() + i);
             } else {
                 weapons[i].fire();
-                window.draw(weapons[i].getSprite(getTexture(type, 0)));
+
+                switch (weapons[i].getType()){
+                    case 1:
+                        window.draw(weapons[i].getSprite(mobLazer1));
+                        break;
+                    case 2:
+                        window.draw(weapons[i].getSprite(mobLazer2));
+                        break;
+                    case 3:
+                        window.draw(weapons[i].getSprite(mobLazer3));
+                        break;
+                }
+
+
             }
         }
     }
 
-    Texture getTexture(int type, int mobOrLazer){
-        // mobOrLazer == 1 -> is mob
-        if(mobOrLazer == 1){
-            switch (type){
-                case 1:
-                    return monsterTexture1;
-                case 2:
-                    return monsterTexture2;
-                case 3:
-                    return monsterTexture3;
-            }
-        } else {
-            switch (type){
-                case 1:
-                    return mobLazer1;
-                case 2:
-                    return mobLazer2;
-                case 3:
-                    return mobLazer3;
-            }
-        }
-    }
+
 };
 
 #endif //COSC2131_PROJECT_S3445846_S3372771_GAME_HPP

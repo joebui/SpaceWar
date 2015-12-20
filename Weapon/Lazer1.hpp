@@ -5,10 +5,11 @@
 
 class Lazer1 : public Weapon {
 public:
-    Lazer1(int xMon, int yMon, unsigned int xSize, unsigned int ySize) {
+    Lazer1(int xMon, int yMon, unsigned int xSize, unsigned int ySize, int typeInput) {
         x = xMon + xSize / 3;
         y = yMon + ySize / 7;
         sprite.setPosition(x, y);
+        type = typeInput;
     }
 
     void fire() {

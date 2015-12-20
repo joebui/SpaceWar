@@ -71,7 +71,7 @@ public:
     void fireBullet(vector<Lazer1> &weapons) {
         Time fire = fireClock.getElapsedTime();
         if (fire.asSeconds() >= 1) {
-            Lazer1 lazer1 (x, y, texture.getSize().x, texture.getSize().y);
+            Lazer1 lazer1 (x, y, texture.getSize().x, texture.getSize().y, type);
             weapons.push_back(lazer1);
             fireClock.restart();
         }
@@ -89,7 +89,11 @@ public:
         return health;
     }
 
-    const Sprite &getSprite(Texture &texture) {
+    int getType() const {
+        return type;
+    }
+
+    Sprite &getSprite(Texture &texture) {
         sprite.setTexture(texture);
         bounding = sprite.getGlobalBounds();
         return sprite;
