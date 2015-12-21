@@ -29,6 +29,7 @@ private:
     Level level;
     int curLevel = 1;
     bool changeLevel = false;
+    bool spawnMonster = true;
 public:
     Game() {
         monsterTexture1.loadFromFile("Monster1 1 HP.png");
@@ -72,7 +73,7 @@ public:
 
                     curLevel += 1;
                     changeLevel = true;
-                    cout <<  curLevel <<" ";
+                    // Print Current level here
                     levelClock.restart();
                 }
 
@@ -89,7 +90,11 @@ public:
 
                 if(spawnMonstersList.size() != 0){
                     spawnMonsters(monsters, window, spawnMonstersList.at(spawnMonstersList.size() -1 ));
-                    spawnMonstersList.pop_back();
+
+                    // if Monster should spawn
+                    if(spawnMonster){
+                        spawnMonstersList.pop_back();
+                    }
                 }
                 // Check missile collion with monsters.
                 ship.checkBulletMonsterCollision(monsters);
@@ -103,11 +108,14 @@ public:
     void spawnMonsters(vector<Monster> &monsters, RenderWindow &window, int type) {
         // Spawn monster every 1s.
         Time elapsed = clock.getElapsedTime();
-        float monsterSpawnTime = 10 / monsterSize * 1000;
+        float monsterSpawnTime = (float)10 / monsterSize * 1000;
         if (elapsed.asMilliseconds () >= monsterSpawnTime) {
             Monster monster(type);
             monsters.push_back(monster);
             clock.restart();
+            spawnMonster = true;
+        } else {
+            spawnMonster = false;
         }
 
         // Remove monster going out of the screen boundary.
