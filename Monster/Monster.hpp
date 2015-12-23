@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <thread>
 #include "../Weapon/Lazer1.hpp"
+#include "../Ship.hpp"
 
 using namespace sf;
 using namespace std;
@@ -36,27 +37,41 @@ public:
             case 1:
                 texture.loadFromFile("lazer1.png");
                 texture.setSmooth(true);
+                health = 1;
+
                 break;
             case 2:
                 texture.loadFromFile("lazer2.png");
                 texture.setSmooth(true);
+                health = 2;
+
                 break;
             case 3:
                 texture.loadFromFile("lazer3.png");
                 texture.setSmooth(true);
+                health = 3;
                 break;
         }
 
 
         x = 0;
         y = rand() % 300;
-        health = 1;
 
         sprite.setPosition(x, y);
     }
 
     void move() {
         x += 5;
+        sprite.setPosition(x, y);
+    }
+
+    void followShip(int shipX){
+        if (x > shipX) {
+            x -= 5;
+        }
+        else {
+            x += 5;
+        }
         sprite.setPosition(x, y);
     }
 
@@ -70,7 +85,9 @@ public:
 
     void fireBullet(vector<Lazer1> &weapons) {
         Time fire = fireClock.getElapsedTime();
-        if (fire.asSeconds() >= 1) {
+        float random = ((float) rand()) / (float) (RAND_MAX / 6);
+        cout << random;
+        if (fire.asSeconds() >= random) {
             Lazer1 lazer1 (x, y, texture.getSize().x, texture.getSize().y, type);
             weapons.push_back(lazer1);
             fireClock.restart();

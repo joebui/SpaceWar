@@ -115,7 +115,12 @@ public:
             if (monsters[i].getX() >= 1024) {
                 monsters.erase(monsters.begin() + i);
             } else {
-                monsters[i].move();
+                if(monsters[i].getType() !=3){
+                    monsters[i].move();
+                }
+                else {
+                    monsters[i].followShip(ship.getX());
+                }
                 monsters[i].fireBullet(weapons);
 
                 switch (monsters[i].getType()){

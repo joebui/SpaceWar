@@ -36,7 +36,12 @@ public:
         sprite.setPosition(x, y);
     }
 
-    // Move the ship with keyboard.
+
+    int getX() const {
+        return x;
+    }
+
+// Move the ship with keyboard.
     void controlMovement(RenderWindow &window) {
         // Move right.
         if (Keyboard::isKeyPressed(Keyboard::Right))
