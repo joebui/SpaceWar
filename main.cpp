@@ -6,5 +6,7 @@ int main() {
     Game game;
     game.run();
 
+//    float random = ((float) rand()) / (float) (RAND_MAX / 6);
+//    cout<< random << " ";
     return EXIT_SUCCESS;
 }

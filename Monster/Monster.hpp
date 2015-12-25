@@ -20,7 +20,7 @@ private:
     int y;
     int health;
     int type;
-
+    float shootTimer;
 public:
     Monster() {
         texture.loadFromFile("lazer1.png");
@@ -28,7 +28,7 @@ public:
         x = 0;
         y = rand() % 300;
         health = 1;
-
+        shootTimer = ((float) rand()) / (float) (RAND_MAX / 1);
         sprite.setPosition(x, y);
     }
 
@@ -56,7 +56,7 @@ public:
 
         x = 0;
         y = rand() % 300;
-
+        shootTimer = ((float) rand()) / (float) (RAND_MAX / 1);
         sprite.setPosition(x, y);
     }
 
@@ -67,10 +67,10 @@ public:
 
     void followShip(int shipX){
         if (x > shipX) {
-            x -= 5;
+            x -= 3;
         }
         else {
-            x += 5;
+            x += 3;
         }
         sprite.setPosition(x, y);
     }
@@ -85,12 +85,24 @@ public:
 
     void fireBullet(vector<Lazer1> &weapons) {
         Time fire = fireClock.getElapsedTime();
-        float random = ((float) rand()) / (float) (RAND_MAX / 6);
-        cout << random;
-        if (fire.asSeconds() >= random) {
-            Lazer1 lazer1 (x, y, texture.getSize().x, texture.getSize().y, type);
-            weapons.push_back(lazer1);
-            fireClock.restart();
+
+        switch(type){
+            case 3:
+                if (fire.asSeconds() >= 1.5) {
+                    Lazer1 lazer1 (x, y, texture.getSize().x, texture.getSize().y, type);
+                    weapons.push_back(lazer1);
+                    fireClock.restart();
+                }
+
+                break;
+            default:
+                if (fire.asSeconds() >= shootTimer) {
+                    Lazer1 lazer1 (x, y, texture.getSize().x, texture.getSize().y, type);
+                    weapons.push_back(lazer1);
+                    fireClock.restart();
+                    shootTimer = ((float) rand()) / (float) (RAND_MAX / 1);
+                }
+                break;
         }
     }
 
