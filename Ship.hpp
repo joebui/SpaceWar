@@ -5,6 +5,7 @@
 #include <iostream>
 #include "Weapon/Missile.hpp"
 #include "Monster/Monster.hpp"
+#include "Monster/MinusHealth.h"
 
 using namespace sf;
 using namespace std;
@@ -84,12 +85,14 @@ public:
         }
     }
 
-    void checkBulletMonsterCollision(vector<Monster> &monsters) {
+    void checkBulletMonsterCollision(vector<Monster> &monsters, vector<MinusHealth> &minusList) {
         // Check collision with monsters.
         for (int i = 0; i < monsters.size(); ++i) {
             for (int j = 0; j < missiles.size(); ++j) {
                 if (monsters[i].checkIntersection(missiles[j].getBounding())) {
                     monsters[i].reduceHealth();
+                    MinusHealth healthReducedIcon {monsters[i].getX(), monsters[i].getY()};
+                    minusList.push_back(healthReducedIcon);
                     if (monsters[i].getHealth() <= 0)
                         monsters[i].setX(1024);
 

@@ -114,6 +114,10 @@ public:
         Monster::x = x;
     }
 
+    int getY() const {
+        return y;
+    }
+
     int getHealth() const {
         return health;
     }

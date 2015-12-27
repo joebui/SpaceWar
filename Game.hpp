@@ -8,6 +8,7 @@
 #include "Ship.hpp"
 #include "Monster/Monster.hpp"
 #include "Level.h"
+#include "Monster/MinusHealth.h"
 
 using namespace sf;
 
@@ -25,10 +26,17 @@ private:
     vector<int> spawnMonstersList;
     int monsterSize;
     vector<Lazer1> weapons;
+
+    // Minus Health
+    Texture minusIcon;
+    vector<MinusHealth> minusList;
+
+    // Level
     Clock levelClock;
     Level level;
     int curLevel = 1;
     bool changeLevel = false;
+
 public:
     Game() {
         monsterTexture1.loadFromFile("Monster1 1 HP.png");
@@ -45,6 +53,9 @@ public:
         monsterTexture3.setSmooth(true);
         mobLazer3.loadFromFile("lazer3.png");
         mobLazer3.setSmooth(true);
+
+        minusIcon.loadFromFile("ReduceHP.png");
+        minusIcon.setSmooth(true);
     }
 
     void run() {
@@ -92,8 +103,19 @@ public:
                     spawnMonstersList.pop_back();
                 }
                 // Check missile collion with monsters.
-                ship.checkBulletMonsterCollision(monsters);
+                ship.checkBulletMonsterCollision(monsters, minusList);
                 ship.checkLazerPlayerCollision(weapons);
+
+                //Show Icon
+                for (unsigned int i = 0; i < minusList.size(); ++i) {
+                    if (minusList[i].getY() > 720) {
+                        minusList.erase(minusList.begin() + i);
+                    } else {
+                        minusList[i].move();
+                        window.draw(minusList[i].getSprite(minusIcon));
+                        minusList[i].checkTimer();
+                    }
+                }
             }
             // Control ship movement.
             window.display();
