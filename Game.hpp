@@ -5,6 +5,7 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
+#include <sstream>
 #include "Ship.hpp"
 #include "Monster/Monster.hpp"
 #include "Level.h"
@@ -34,8 +35,11 @@ private:
     // Level
     Clock levelClock;
     Level level;
-    int curLevel = 1;
+    int curLevel = 0;
     bool changeLevel = false;
+    Text levelText;
+    String levelString;
+    Font font;
 
 public:
     Game() {
@@ -56,6 +60,9 @@ public:
 
         minusIcon.loadFromFile("ReduceHP.png");
         minusIcon.setSmooth(true);
+
+        font.loadFromFile("arial.ttf");
+
     }
 
     void run() {
@@ -79,13 +86,26 @@ public:
 
                 // Change Level
                 Time levelElapsed = levelClock.getElapsedTime();
-                if(levelElapsed.asSeconds () >= 10){
+                if(levelElapsed.asSeconds () >= 10 || curLevel == 0){
 
                     curLevel += 1;
                     changeLevel = true;
                     cout <<  curLevel <<" ";
                     levelClock.restart();
+
+                    // Set Level String Data
+                    stringstream type;
+                    type << curLevel;
+                    levelString = "Level : " + type.str();
+                    levelText.setString(levelString);
+                    levelText.setCharacterSize(30);
+                    levelText.setStyle(sf::Text::Bold);
+                    levelText.setFont(font);
+                    levelText.move(20,0);
                 }
+
+                // Draw Level String
+                window.draw(levelText);
 
                 // check for spawnMonster vector size
                 if(spawnMonstersList.size() == 0 || changeLevel){
@@ -106,7 +126,7 @@ public:
                 ship.checkBulletMonsterCollision(monsters, minusList);
                 ship.checkLazerPlayerCollision(weapons);
 
-                //Show Icon
+                //Show Hit Icon
                 for (unsigned int i = 0; i < minusList.size(); ++i) {
                     if (minusList[i].getY() > 720) {
                         minusList.erase(minusList.begin() + i);
