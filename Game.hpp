@@ -93,7 +93,7 @@ public:
 
                 // Change Level
                 Time levelElapsed = levelClock.getElapsedTime();
-                if(levelElapsed.asSeconds () >= 10 || curLevel == 0){
+                if(levelElapsed.asSeconds () >= 90 || curLevel == 0){
 
                     curLevel += 1;
                     changeLevel = true;
@@ -128,6 +128,14 @@ public:
                     spawnMonsters(monsters, window, spawnMonstersList.at(spawnMonstersList.size() -1 ));
                     spawnMonstersList.pop_back();
                 }
+
+                // check Shield
+                if(ship.isShieldUp()){
+                    ship.checkLazerShieldCollision(weapons);
+                    window.draw(ship.getShield().getSprite());
+                    ship.turnShieldOff();
+                }
+
                 // Check missile collion with monsters.
                 ship.checkBulletMonsterCollision(monsters, minusList);
                 ship.checkLazerPlayerCollision(weapons);
