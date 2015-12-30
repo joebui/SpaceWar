@@ -20,7 +20,9 @@ private:
     int x, y;
     bool isDead;
     Clock clock;
-
+    int score = 0;
+    int health = 100;
+    Clock immuTimer;
 public:
     Ship() {
         shipTexture.loadFromFile("Spaceship.png");
@@ -40,6 +42,14 @@ public:
 
     int getX() const {
         return x;
+    }
+
+    int getScore() const {
+        return score;
+    }
+
+    int getHealth() const {
+        return health;
     }
 
 // Move the ship with keyboard.
@@ -93,10 +103,11 @@ public:
                     monsters[i].reduceHealth();
                     MinusHealth healthReducedIcon {monsters[i].getX(), monsters[i].getY()};
                     minusList.push_back(healthReducedIcon);
-                    if (monsters[i].getHealth() <= 0)
+                    if (monsters[i].getHealth() <= 0){
                         monsters[i].setX(1024);
-
-                    missiles[j].setY(-10);
+                        score += monsters[i].getScore();
+                    }
+                        missiles[j].setY(-10);
                 }
             }
         }
@@ -106,9 +117,17 @@ public:
         // Check lazer collision with ship.
         for (int i = 0; i < lazers.size(); ++i) {
             if (bounding.intersects(lazers[i].getBounding())) {
+                Time hitTime = immuTimer.getElapsedTime();
+
                 cout << "Hit player" << endl;
-                lazers[i].setY(-10);
-                isDead = true;
+                lazers[i].setY(721);
+                if(hitTime.asSeconds() >= 1){
+                    health -= lazers[i].getType();
+                    if(health <= 0){
+                        isDead = true;
+                    }
+                    immuTimer.restart();
+                }
             }
         }
     }

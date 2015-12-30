@@ -41,6 +41,14 @@ private:
     String levelString;
     Font font;
 
+    // Score
+    Text scoreText;
+    String scoreString;
+
+    // Score
+    Text healthText;
+    String healthString;
+
 public:
     Game() {
         monsterTexture1.loadFromFile("Monster1 1 HP.png");
@@ -62,7 +70,6 @@ public:
         minusIcon.setSmooth(true);
 
         font.loadFromFile("arial.ttf");
-
     }
 
     void run() {
@@ -92,20 +99,19 @@ public:
                     changeLevel = true;
                     cout <<  curLevel <<" ";
                     levelClock.restart();
-
-                    // Set Level String Data
-                    stringstream type;
-                    type << curLevel;
-                    levelString = "Level : " + type.str();
-                    levelText.setString(levelString);
-                    levelText.setCharacterSize(30);
-                    levelText.setStyle(sf::Text::Bold);
-                    levelText.setFont(font);
-                    levelText.move(20,0);
+                    setLevelText();
                 }
 
                 // Draw Level String
                 window.draw(levelText);
+
+                // Draw Score String
+                setScoreText();
+                window.draw(scoreText);
+
+                // Draw Health String
+                setHealthText();
+                window.draw(healthText);
 
                 // check for spawnMonster vector size
                 if(spawnMonstersList.size() == 0 || changeLevel){
@@ -145,7 +151,7 @@ public:
     void spawnMonsters(vector<Monster> &monsters, RenderWindow &window, int type) {
         // Spawn monster every 1s.
         Time elapsed = clock.getElapsedTime();
-        float monsterSpawnTime = 10 / monsterSize * 1000;
+        float monsterSpawnTime = (float) 10 / monsterSize * 1000;
         if (elapsed.asMilliseconds () >= monsterSpawnTime) {
             Monster monster(type);
             monsters.push_back(monster);
@@ -202,6 +208,41 @@ public:
         }
     }
 
+    void setLevelText(){
+        // Set Level String Data
+        stringstream type;
+        type << curLevel;
+        levelString = "Level : " + type.str();
+        levelText.setString(levelString);
+        levelText.setCharacterSize(30);
+        levelText.setStyle(sf::Text::Bold);
+        levelText.setFont(font);
+        levelText.setPosition(10, 2);
+    }
+
+    void setScoreText(){
+        // Set Level String Data
+        stringstream type;
+        type << ship.getScore();
+        scoreString = "Score : " + type.str();
+        scoreText.setString(scoreString);
+        scoreText.setCharacterSize(30);
+        scoreText.setStyle(sf::Text::Bold);
+        scoreText.setFont(font);
+        scoreText.setPosition(850, 2);
+    }
+
+    void setHealthText(){
+        // Set Level String Data
+        stringstream type;
+        type << ship.getHealth();
+        healthString = "Health : " + type.str();
+        healthText.setString(healthString);
+        healthText.setCharacterSize(30);
+        healthText.setStyle(sf::Text::Bold);
+        healthText.setFont(font);
+        healthText.setPosition(400, 2);
+    }
 
 };
 

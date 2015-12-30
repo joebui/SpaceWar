@@ -21,6 +21,8 @@ private:
     int health;
     int type;
     float shootTimer;
+    int score;
+
 public:
     Monster() {
         texture.loadFromFile("lazer1.png");
@@ -30,6 +32,7 @@ public:
         health = 1;
         shootTimer = ((float) rand()) / (float) (RAND_MAX / 1);
         sprite.setPosition(x, y);
+        score = 1;
     }
 
     Monster(int type): type{type}{
@@ -38,18 +41,19 @@ public:
                 texture.loadFromFile("lazer1.png");
                 texture.setSmooth(true);
                 health = 1;
-
+                score = 1;
                 break;
             case 2:
                 texture.loadFromFile("lazer2.png");
                 texture.setSmooth(true);
                 health = 2;
-
+                score = 3;
                 break;
             case 3:
                 texture.loadFromFile("lazer3.png");
                 texture.setSmooth(true);
                 health = 3;
+                score = 10;
                 break;
         }
 
@@ -124,6 +128,10 @@ public:
 
     int getType() const {
         return type;
+    }
+
+    int getScore() const {
+        return score;
     }
 
     Sprite &getSprite(Texture &texture) {
