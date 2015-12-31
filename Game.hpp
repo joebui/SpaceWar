@@ -172,7 +172,7 @@ public:
     void drawShipAndBullet(RenderWindow &window){
         // Remove monster going out of the screen boundary.
         for (int i = 0; i < monsters.size(); ++i) {
-            if (monsters[i].getX() >= 1024) {
+            if (monsters[i].getX() >= 1024 || monsters[i].getX() <= -1) {
                 monsters.erase(monsters.begin() + i);
             } else {
                 if(monsters[i].getType() !=3){

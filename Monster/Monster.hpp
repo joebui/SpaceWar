@@ -22,7 +22,7 @@ private:
     int type;
     float shootTimer;
     int score;
-    bool leftDirection;
+    int direction;
 
 public:
     Monster() {
@@ -34,6 +34,8 @@ public:
         shootTimer = ((float) rand()) / (float) (RAND_MAX / 1);
         sprite.setPosition(x, y);
         score = 1;
+
+        direction = rand() % 2;
     }
 
     Monster(int type): type{type}{
@@ -58,15 +60,29 @@ public:
                 break;
         }
 
-
-        x = 0;
         y = rand() % 300;
         shootTimer = ((float) rand()) / (float) (RAND_MAX / 1);
         sprite.setPosition(x, y);
+        direction = rand() % 2;
+
+        switch(direction){
+            case 0:
+                x = 0;
+                break;
+            case 1:
+                x = 1023;
+        }
     }
 
     void move() {
-        x += 5;
+        switch(direction){
+            case 0:
+                x += 5;
+                break;
+            case 1:
+                x -= 5;
+        }
+
         sprite.setPosition(x, y);
     }
 

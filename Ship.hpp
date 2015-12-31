@@ -26,6 +26,7 @@ private:
     Clock immuTimer;
     bool shieldUp;
     Shield shield;
+    float immuTime = 0.5;
 public:
     Ship() {
         shipTexture.loadFromFile("Spaceship.png");
@@ -137,7 +138,7 @@ public:
 
                 cout << "Hit player" << endl;
                 lazers[i].setY(721);
-                if(hitTime.asSeconds() >= 1){
+                if(hitTime.asSeconds() >= immuTime){
                     health -= lazers[i].getType();
                     if(health <= 0){
                         isDead = true;
@@ -160,7 +161,7 @@ public:
 
     void turnShieldOff(){
         Time hitTime = immuTimer.getElapsedTime();
-        if(hitTime.asSeconds() >= 1){
+        if(hitTime.asSeconds() >= immuTime){
             shieldUp = false;
         }
     }
