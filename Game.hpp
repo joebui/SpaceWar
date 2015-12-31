@@ -5,9 +5,11 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
+#include <sstream>
 #include "Ship.hpp"
 #include "Monster/Monster.hpp"
 #include "Level.h"
+#include "Monster/MinusHealth.h"
 
 using namespace sf;
 
@@ -25,11 +27,28 @@ private:
     vector<int> spawnMonstersList;
     int monsterSize;
     vector<Lazer1> weapons;
+
+    // Minus Health
+    Texture minusIcon;
+    vector<MinusHealth> minusList;
+
+    // Level
     Clock levelClock;
     Level level;
-    int curLevel = 1;
+    int curLevel = 0;
     bool changeLevel = false;
-    bool spawnMonster = true;
+
+    Text levelText;
+    String levelString;
+    Font font;
+
+    // Score
+    Text scoreText;
+    String scoreString;
+
+    // Score
+    Text healthText;
+    String healthString;
 public:
     Game() {
         monsterTexture1.loadFromFile("Monster1 1 HP.png");
@@ -46,6 +65,11 @@ public:
         monsterTexture3.setSmooth(true);
         mobLazer3.loadFromFile("lazer3.png");
         mobLazer3.setSmooth(true);
+
+        minusIcon.loadFromFile("ReduceHP.png");
+        minusIcon.setSmooth(true);
+
+        font.loadFromFile("arial.ttf");
     }
 
     void run() {
@@ -69,13 +93,25 @@ public:
 
                 // Change Level
                 Time levelElapsed = levelClock.getElapsedTime();
-                if(levelElapsed.asSeconds () >= 10){
+                if(levelElapsed.asSeconds () >= 10 || curLevel == 0){
 
                     curLevel += 1;
                     changeLevel = true;
                     // Print Current level here
                     levelClock.restart();
+                    setLevelText();
                 }
+
+                // Draw Level String
+                window.draw(levelText);
+
+                // Draw Score String
+                setScoreText();
+                window.draw(scoreText);
+
+                // Draw Health String
+                setHealthText();
+                window.draw(healthText);
 
                 // check for spawnMonster vector size
                 if(spawnMonstersList.size() == 0 || changeLevel){
@@ -90,15 +126,30 @@ public:
 
                 if(spawnMonstersList.size() != 0){
                     spawnMonsters(monsters, window, spawnMonstersList.at(spawnMonstersList.size() -1 ));
+                    spawnMonstersList.pop_back();
+                }
 
-                    // if Monster should spawn
-                    if(spawnMonster){
-                        spawnMonstersList.pop_back();
+                // check Shield
+                if(ship.isShieldUp()){
+                    ship.checkLazerShieldCollision(weapons);
+                    window.draw(ship.getShield().getSprite());
+                    ship.turnShieldOff();
+                }
+
+                // Check missile collion with monsters.
+                ship.checkBulletMonsterCollision(monsters, minusList);
+                ship.checkLazerPlayerCollision(weapons);
+
+                //Show Hit Icon
+                for (unsigned int i = 0; i < minusList.size(); ++i) {
+                    if (minusList[i].getY() > 720) {
+                        minusList.erase(minusList.begin() + i);
+                    } else {
+                        minusList[i].move();
+                        window.draw(minusList[i].getSprite(minusIcon));
+                        minusList[i].checkTimer();
                     }
                 }
-                // Check missile collion with monsters.
-                ship.checkBulletMonsterCollision(monsters);
-                ship.checkLazerPlayerCollision(weapons);
             }
             // Control ship movement.
             window.display();
@@ -108,14 +159,13 @@ public:
     void spawnMonsters(vector<Monster> &monsters, RenderWindow &window, int type) {
         // Spawn monster every 1s.
         Time elapsed = clock.getElapsedTime();
-        float monsterSpawnTime = (float)10 / monsterSize * 1000;
+
+        float monsterSpawnTime = (float) 10 / monsterSize * 1000;
+
         if (elapsed.asMilliseconds () >= monsterSpawnTime) {
             Monster monster(type);
             monsters.push_back(monster);
             clock.restart();
-            spawnMonster = true;
-        } else {
-            spawnMonster = false;
         }
 
         // Remove monster going out of the screen boundary.
@@ -123,7 +173,12 @@ public:
             if (monsters[i].getX() >= 1024) {
                 monsters.erase(monsters.begin() + i);
             } else {
-                monsters[i].move();
+                if(monsters[i].getType() !=3){
+                    monsters[i].move();
+                }
+                else {
+                    monsters[i].followShip(ship.getX());
+                }
                 monsters[i].fireBullet(weapons);
 
                 switch (monsters[i].getType()){
@@ -163,6 +218,41 @@ public:
         }
     }
 
+    void setLevelText(){
+        // Set Level String Data
+        stringstream type;
+        type << curLevel;
+        levelString = "Level : " + type.str();
+        levelText.setString(levelString);
+        levelText.setCharacterSize(30);
+        levelText.setStyle(sf::Text::Bold);
+        levelText.setFont(font);
+        levelText.setPosition(10, 2);
+    }
+
+    void setScoreText(){
+        // Set Level String Data
+        stringstream type;
+        type << ship.getScore();
+        scoreString = "Score : " + type.str();
+        scoreText.setString(scoreString);
+        scoreText.setCharacterSize(30);
+        scoreText.setStyle(sf::Text::Bold);
+        scoreText.setFont(font);
+        scoreText.setPosition(850, 2);
+    }
+
+    void setHealthText(){
+        // Set Level String Data
+        stringstream type;
+        type << ship.getHealth();
+        healthString = "Health : " + type.str();
+        healthText.setString(healthString);
+        healthText.setCharacterSize(30);
+        healthText.setStyle(sf::Text::Bold);
+        healthText.setFont(font);
+        healthText.setPosition(400, 2);
+    }
 
 };
 

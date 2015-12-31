@@ -5,6 +5,8 @@
 #include <iostream>
 #include "Weapon/Missile.hpp"
 #include "Monster/Monster.hpp"
+#include "Monster/MinusHealth.h"
+#include "Weapon/Shield.h"
 
 using namespace sf;
 using namespace std;
@@ -19,7 +21,11 @@ private:
     int x, y;
     bool isDead;
     Clock clock;
-
+    int score = 0;
+    int health = 100;
+    Clock immuTimer;
+    bool shieldUp;
+    Shield shield;
 public:
     Ship() {
         shipTexture.loadFromFile("Spaceship.png");
@@ -34,9 +40,31 @@ public:
         y = 630;
         isDead = false;
         sprite.setPosition(x, y);
+        shieldUp = false;
     }
 
-    // Move the ship with keyboard.
+
+    int getX() const {
+        return x;
+    }
+
+    int getScore() const {
+        return score;
+    }
+
+    int getHealth() const {
+        return health;
+    }
+
+    Shield &getShield() {
+        return shield;
+    }
+
+    bool isShieldUp() const {
+        return shieldUp;
+    }
+
+// Move the ship with keyboard.
     void controlMovement(RenderWindow &window) {
         // Move right.
         if (Keyboard::isKeyPressed(Keyboard::Right))
@@ -64,6 +92,10 @@ public:
         else if (x < 0)
             x = 0;
 
+        if(shieldUp){
+            shield.updateShield(x,y);
+        }
+
         sprite.setPosition(x, y);
     }
 
@@ -79,16 +111,19 @@ public:
         }
     }
 
-    void checkBulletMonsterCollision(vector<Monster> &monsters) {
+    void checkBulletMonsterCollision(vector<Monster> &monsters, vector<MinusHealth> &minusList) {
         // Check collision with monsters.
         for (int i = 0; i < monsters.size(); ++i) {
             for (int j = 0; j < missiles.size(); ++j) {
                 if (monsters[i].checkIntersection(missiles[j].getBounding())) {
                     monsters[i].reduceHealth();
-                    if (monsters[i].getHealth() <= 0)
+                    MinusHealth healthReducedIcon {monsters[i].getX(), monsters[i].getY()};
+                    minusList.push_back(healthReducedIcon);
+                    if (monsters[i].getHealth() <= 0){
                         monsters[i].setX(1024);
-
-                    missiles[j].setY(-10);
+                        score += monsters[i].getScore();
+                    }
+                        missiles[j].setY(-10);
                 }
             }
         }
@@ -98,10 +133,35 @@ public:
         // Check lazer collision with ship.
         for (int i = 0; i < lazers.size(); ++i) {
             if (bounding.intersects(lazers[i].getBounding())) {
+                Time hitTime = immuTimer.getElapsedTime();
+
                 cout << "Hit player" << endl;
-                lazers[i].setY(-10);
-                isDead = true;
+                lazers[i].setY(721);
+                if(hitTime.asSeconds() >= 1){
+                    health -= lazers[i].getType();
+                    if(health <= 0){
+                        isDead = true;
+                    }
+                    immuTimer.restart();
+                    shieldUp = true;
+                }
             }
+        }
+    }
+
+    void checkLazerShieldCollision(vector<Lazer1> &lazers) {
+        // Check lazer collision with ship.
+        for (int i = 0; i < lazers.size(); ++i) {
+            if (shield.checkIntersection(lazers[i].getBounding())) {
+                lazers[i].setY(721);
+            }
+        }
+    }
+
+    void turnShieldOff(){
+        Time hitTime = immuTimer.getElapsedTime();
+        if(hitTime.asSeconds() >= 1){
+            shieldUp = false;
         }
     }
 
