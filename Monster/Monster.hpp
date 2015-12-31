@@ -22,6 +22,7 @@ private:
     int type;
     float shootTimer;
     int score;
+    bool leftDirection;
 
 public:
     Monster() {

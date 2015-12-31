@@ -93,7 +93,7 @@ public:
 
                 // Change Level
                 Time levelElapsed = levelClock.getElapsedTime();
-                if(levelElapsed.asSeconds () >= 90 || curLevel == 0){
+                if(levelElapsed.asSeconds () >= 10 || curLevel == 0){
 
                     curLevel += 1;
                     changeLevel = true;
@@ -124,10 +124,12 @@ public:
                 window.draw(ship.getSprite());
                 // Spawn new monster.
 
-                if(spawnMonstersList.size() != 0){
+                if(spawnMonstersList.size() != 0 && monsters.size() <= 15){
                     spawnMonsters(monsters, window, spawnMonstersList.at(spawnMonstersList.size() -1 ));
                     spawnMonstersList.pop_back();
                 }
+
+                drawShipAndBullet(window);
 
                 // check Shield
                 if(ship.isShieldUp()){
@@ -165,7 +167,9 @@ public:
             monsters.push_back(monster);
             clock.restart();
         }
+    }
 
+    void drawShipAndBullet(RenderWindow &window){
         // Remove monster going out of the screen boundary.
         for (int i = 0; i < monsters.size(); ++i) {
             if (monsters[i].getX() >= 1024) {
