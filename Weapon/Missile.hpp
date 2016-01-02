@@ -8,14 +8,14 @@ using namespace sf;
 
 class Missile : public Weapon {
 public:
-    Missile(int xShip, int yShip, unsigned int xSize, unsigned int ySize) {
-        x = xShip + xSize / 3;
+    Missile(int xShip, int yShip, unsigned int xSize, unsigned int ySize, int xDiv) {
+        x = xShip + xSize / xDiv;
         y = yShip + ySize / 7;
         sprite.setPosition(x, y);
     }
 
     void fire() {
-        y -= 5;
+        y -= 7;
         sprite.setPosition(x, y);
     }
 };

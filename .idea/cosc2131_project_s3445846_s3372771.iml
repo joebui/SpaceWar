@@ -3,14 +3,16 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/Monster/Monster.hpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Ship.hpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Game.hpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Level.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Weapon/Missile.hpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Weapon/Lazer1.hpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Weapon/Weapon.hpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Features/Menu.hpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Features/GameOver.hpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Game.hpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Level.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Ship.hpp" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">

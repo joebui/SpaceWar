@@ -10,33 +10,35 @@
 #include "Monster/Monster.hpp"
 #include "Level.h"
 #include "Monster/MinusHealth.h"
+#include "Features/Menu.hpp"
+#include "Features/GameOver.hpp"
 
 using namespace sf;
 
 class Game {
 private:
+    bool isGameOn, changeLevel;
+
     Ship ship;
     Clock clock;
-    Texture monsterTexture1;
-    Texture mobLazer1;
-    Texture monsterTexture2;
-    Texture mobLazer2;
-    Texture monsterTexture3;
-    Texture mobLazer3;
+    Menu menu;
+    GameOver gameOver;
+    Texture background, monsterTexture1, mobLazer1, monsterTexture2;
+    Texture mobLazer2, monsterTexture3, mobLazer3, minusIcon;
+    Sprite bg, bgNext;
     vector<Monster> monsters;
     vector<int> spawnMonstersList;
     int monsterSize;
+    int x;
     vector<Lazer1> weapons;
 
     // Minus Health
-    Texture minusIcon;
     vector<MinusHealth> minusList;
 
     // Level
     Clock levelClock;
     Level level;
-    int curLevel = 0;
-    bool changeLevel = false;
+    int curLevel;
 
     Text levelText;
     String levelString;
@@ -49,31 +51,37 @@ private:
     // Score
     Text healthText;
     String healthString;
+
 public:
     Game() {
-        monsterTexture1.loadFromFile("Monster1 1 HP.png");
+        curLevel = 0;
+        isGameOn = false;
+        changeLevel = false;
+        background.loadFromFile("images/background.jpg");
+
+        monsterTexture1.loadFromFile("images/Monster1 1 HP.png");
         monsterTexture1.setSmooth(true);
-        mobLazer1.loadFromFile("lazer1.png");
+        mobLazer1.loadFromFile("images/lazer1.png");
         mobLazer1.setSmooth(true);
 
-        monsterTexture2.loadFromFile("Monster2 2 HP.png");
+        monsterTexture2.loadFromFile("images/Monster2 2 HP.png");
         monsterTexture2.setSmooth(true);
-        mobLazer2.loadFromFile("lazer2.png");
+        mobLazer2.loadFromFile("images/lazer2.png");
         mobLazer2.setSmooth(true);
 
-        monsterTexture3.loadFromFile("Monster3 3 HP.png");
+        monsterTexture3.loadFromFile("images/Monster3 3 HP.png");
         monsterTexture3.setSmooth(true);
-        mobLazer3.loadFromFile("lazer3.png");
+        mobLazer3.loadFromFile("images/lazer3.png");
         mobLazer3.setSmooth(true);
 
-        minusIcon.loadFromFile("ReduceHP.png");
+        minusIcon.loadFromFile("images/ReduceHP.png");
         minusIcon.setSmooth(true);
 
-        font.loadFromFile("arial.ttf");
+        font.loadFromFile("fonts/arial.ttf");
     }
 
     void run() {
-        RenderWindow window(VideoMode(1024, 720), "Space War", Style::Default, ContextSettings(32));
+        RenderWindow window(VideoMode(1024, 720), "Space War", Style::Close, ContextSettings(32));
         window.setVerticalSyncEnabled(true);
         glEnable(GL_TEXTURE_2D);
 
@@ -88,72 +96,100 @@ public:
             }
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            // Run game until player dies.
-            if (!ship.isIsDead()) {
+            if (x < 0)
+                x = 1024;
 
-                // Change Level
-                Time levelElapsed = levelClock.getElapsedTime();
-                if(levelElapsed.asSeconds () >= 10 || curLevel == 0){
+            background.setSmooth(true);
+            bg.setTexture(background);
+            bg.setPosition(x - 1024, 0);
+            bgNext.setTexture(background);
+            bgNext.setPosition(x, 0);
+            window.draw(bg);
+            window.draw(bgNext);
 
-                    curLevel += 1;
-                    changeLevel = true;
-                    // Print Current level here
-                    levelClock.restart();
-                    setLevelText();
-                }
+            if (!isGameOn) {
+                menu.display(window, isGameOn);
+            } else {
+                x--;
+                // Run game until player dies.
+                if (!ship.isIsDead() && isGameOn) {
+                    // Change Level
+                    Time levelElapsed = levelClock.getElapsedTime();
+                    if(levelElapsed.asSeconds () >= 10 || curLevel == 0){
 
-                // Draw Level String
-                window.draw(levelText);
+                        curLevel += 1;
+                        changeLevel = true;
+                        // Print Current level here
+                        levelClock.restart();
+                        setLevelText();
+                    }
 
-                // Draw Score String
-                setScoreText();
-                window.draw(scoreText);
+                    // Draw Level String
+                    window.draw(levelText);
 
-                // Draw Health String
-                setHealthText();
-                window.draw(healthText);
+                    // Draw Score String
+                    setScoreText();
+                    window.draw(scoreText);
 
-                // check for spawnMonster vector size
-                if(spawnMonstersList.size() == 0 || changeLevel){
-                    level.addMonster(spawnMonstersList, curLevel);
-                    monsterSize = spawnMonstersList.size();
-                    changeLevel = false;
-                }
+                    // Draw Health String
+                    setHealthText();
+                    window.draw(healthText);
 
-                ship.controlMovement(window);
-                window.draw(ship.getSprite());
-                // Spawn new monster.
+                    // check for spawnMonster vector size
+                    if(spawnMonstersList.size() == 0 || changeLevel){
+                        level.addMonster(spawnMonstersList, curLevel);
+                        monsterSize = (int) spawnMonstersList.size();
+                        changeLevel = false;
+                    }
 
-                if(spawnMonstersList.size() != 0 && monsters.size() <= 15){
-                    spawnMonsters(monsters, window, spawnMonstersList.at(spawnMonstersList.size() -1 ));
-                    spawnMonstersList.pop_back();
-                }
+                    ship.controlMovement(window);
+                    window.draw(ship.getSprite());
+                    // Spawn new monster.
 
-                drawShipAndBullet(window);
+                    if(spawnMonstersList.size() != 0 && monsters.size() <= 15){
+                        spawnMonsters(monsters, window, spawnMonstersList.at(spawnMonstersList.size() -1 ));
+                        spawnMonstersList.pop_back();
+                    }
 
-                // check Shield
-                if(ship.isShieldUp()){
-                    ship.checkLazerShieldCollision(weapons);
-                    window.draw(ship.getShield().getSprite());
-                    ship.turnShieldOff();
-                }
+                    drawShipAndBullet(window);
 
-                // Check missile collion with monsters.
-                ship.checkBulletMonsterCollision(monsters, minusList);
-                ship.checkLazerPlayerCollision(weapons);
+                    // check Shield
+                    if(ship.isShieldUp()){
+                        ship.checkLazerShieldCollision(weapons);
+                        window.draw(ship.getShield().getSprite());
+                        ship.turnShieldOff();
+                    }
 
-                //Show Hit Icon
-                for (unsigned int i = 0; i < minusList.size(); ++i) {
-                    if (minusList[i].getY() > 720) {
-                        minusList.erase(minusList.begin() + i);
-                    } else {
-                        minusList[i].move();
-                        window.draw(minusList[i].getSprite(minusIcon));
-                        minusList[i].checkTimer();
+                    // Check missile collion with monsters.
+                    ship.checkBulletMonsterCollision(monsters, minusList);
+                    ship.checkLazerPlayerCollision(weapons);
+
+                    //Show Hit Icon
+                    for (unsigned int i = 0; i < minusList.size(); ++i) {
+                        if (minusList[i].getY() > 720) {
+                            minusList.erase(minusList.begin() + i);
+                        } else {
+                            minusList[i].move();
+                            window.draw(minusList[i].getSprite(minusIcon));
+                            minusList[i].checkTimer();
+                        }
+                    }
+                } else {
+                    // Clear the monster, player, bullets.
+                    monsters.clear();
+                    spawnMonstersList.clear();
+                    weapons.clear();
+                    minusList.clear();
+
+                    gameOver.display(window);
+                    if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+                        isGameOn = false;
+                        ship.setHealth(1);
+                        ship.setIsDead(false);
                     }
                 }
             }
-            // Control ship movement.
+
             window.display();
         }
     }
@@ -174,7 +210,7 @@ public:
     void drawShipAndBullet(RenderWindow &window){
         // Remove monster going out of the screen boundary.
         for (int i = 0; i < monsters.size(); ++i) {
-            if (monsters[i].getX() >= 1024) {
+            if (monsters[i].getX() >= 1024 || monsters[i].getX() <= -1) {
                 monsters.erase(monsters.begin() + i);
             } else {
                 if(monsters[i].getType() !=3){
@@ -195,6 +231,7 @@ public:
                     case 3:
                         window.draw(monsters[i].getSprite(monsterTexture3));
                         break;
+                    default:break;
                 }
             }
         }
@@ -215,6 +252,7 @@ public:
                     case 3:
                         window.draw(weapons[i].getSprite(mobLazer3));
                         break;
+                    default:break;
                 }
 
 

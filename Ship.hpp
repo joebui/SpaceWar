@@ -2,6 +2,7 @@
 #define COSC2131_PROJECT_S3445846_S3372771_SHIP_HPP
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include "Weapon/Missile.hpp"
 #include "Monster/Monster.hpp"
@@ -22,19 +23,26 @@ private:
     bool isDead;
     Clock clock;
     int score = 0;
-    int health = 100;
+    int health = 1;
     Clock immuTimer;
     bool shieldUp;
     Shield shield;
+    float immuTime = 0.5;
+
+    SoundBuffer rocket;
+    Sound rocketSound;
+
 public:
     Ship() {
-        shipTexture.loadFromFile("Spaceship.png");
+        shipTexture.loadFromFile("images/Spaceship.png");
         shipTexture.setSmooth(true);
-        missileTexture.loadFromFile("missile.png");
+        missileTexture.loadFromFile("images/missile.png");
         missileTexture.setSmooth(true);
 
         sprite.setTexture(shipTexture);
         bounding = sprite.getGlobalBounds();
+
+        rocket.loadFromFile("sounds/rocket.wav");
 
         x = 1024 / 2;
         y = 630;
@@ -79,8 +87,11 @@ public:
             Time elapsed = clock.getElapsedTime();
             // if 0.5 sec has passed, shoot
             if(elapsed.asSeconds() >= 0.5){
-                Missile missile {x, y, shipTexture.getSize().x, shipTexture.getSize().y};
-                missiles.push_back(missile);
+                rocketSound.setBuffer(rocket);
+                rocketSound.play();
+                Missile missile1 {x, y, shipTexture.getSize().x, shipTexture.getSize().y, 2};
+                Missile missile2 {x, y, shipTexture.getSize().x, shipTexture.getSize().y, 10};
+                missiles.push_back(missile1); missiles.push_back(missile2);
                 clock.restart();
             }
         }
@@ -137,9 +148,10 @@ public:
 
                 cout << "Hit player" << endl;
                 lazers[i].setY(721);
-                if(hitTime.asSeconds() >= 1){
+                if(hitTime.asSeconds() >= immuTime){
                     health -= lazers[i].getType();
                     if(health <= 0){
+                        missiles.clear();
                         isDead = true;
                     }
                     immuTimer.restart();
@@ -160,7 +172,7 @@ public:
 
     void turnShieldOff(){
         Time hitTime = immuTimer.getElapsedTime();
-        if(hitTime.asSeconds() >= 1){
+        if(hitTime.asSeconds() >= immuTime){
             shieldUp = false;
         }
     }
@@ -173,6 +185,14 @@ public:
 
     bool isIsDead() const {
         return isDead;
+    }
+
+    void setIsDead(bool isDead) {
+        Ship::isDead = isDead;
+    }
+
+    void setHealth(int health) {
+        Ship::health = health;
     }
 };
 

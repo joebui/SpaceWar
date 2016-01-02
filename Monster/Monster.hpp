@@ -2,6 +2,7 @@
 #define COSC2131_PROJECT_S3445846_S3372771_MONSTER_HPP
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <thread>
 #include "../Weapon/Lazer1.hpp"
 #include "../Ship.hpp"
@@ -22,11 +23,11 @@ private:
     int type;
     float shootTimer;
     int score;
-    bool leftDirection;
+    int direction;
 
 public:
     Monster() {
-        texture.loadFromFile("lazer1.png");
+        texture.loadFromFile("images/lazer1.png");
         texture.setSmooth(true);
         x = 0;
         y = rand() % 300;
@@ -34,39 +35,55 @@ public:
         shootTimer = ((float) rand()) / (float) (RAND_MAX / 1);
         sprite.setPosition(x, y);
         score = 1;
+
+        direction = rand() % 2;
     }
 
     Monster(int type): type{type}{
         switch (type){
             case 1:
-                texture.loadFromFile("lazer1.png");
+                texture.loadFromFile("images/lazer1.png");
                 texture.setSmooth(true);
                 health = 1;
                 score = 1;
                 break;
             case 2:
-                texture.loadFromFile("lazer2.png");
+                texture.loadFromFile("images/lazer2.png");
                 texture.setSmooth(true);
                 health = 2;
                 score = 3;
                 break;
             case 3:
-                texture.loadFromFile("lazer3.png");
+                texture.loadFromFile("images/lazer3.png");
                 texture.setSmooth(true);
                 health = 3;
                 score = 10;
                 break;
         }
 
-
-        x = 0;
         y = rand() % 300;
         shootTimer = ((float) rand()) / (float) (RAND_MAX / 1);
         sprite.setPosition(x, y);
+        direction = rand() % 2;
+
+        switch(direction){
+            case 0:
+                x = 0;
+                break;
+            case 1:
+                x = 1023;
+        }
     }
 
     void move() {
-        x += 5;
+        switch(direction){
+            case 0:
+                x += 5;
+                break;
+            case 1:
+                x -= 5;
+        }
+
         sprite.setPosition(x, y);
     }
 
