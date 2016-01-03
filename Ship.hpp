@@ -22,8 +22,8 @@ private:
     int x, y;
     bool isDead;
     Clock clock;
-    int score = 0;
-    int health = 1;
+    int score;
+    int health;
     Clock immuTimer;
     bool shieldUp;
     Shield shield;
@@ -34,6 +34,8 @@ private:
 
 public:
     Ship() {
+        score = 0;
+        health = 100;
         shipTexture.loadFromFile("images/Spaceship.png");
         shipTexture.setSmooth(true);
         missileTexture.loadFromFile("images/missile.png");
@@ -51,6 +53,9 @@ public:
         shieldUp = false;
     }
 
+    vector<Missile> &getMissiles() {
+        return missiles;
+    }
 
     int getX() const {
         return x;
@@ -58,6 +63,10 @@ public:
 
     int getScore() const {
         return score;
+    }
+
+    void setScore(int score) {
+        Ship::score = score;
     }
 
     int getHealth() const {
@@ -70,6 +79,18 @@ public:
 
     bool isShieldUp() const {
         return shieldUp;
+    }
+
+    bool isIsDead() const {
+        return isDead;
+    }
+
+    void setIsDead(bool isDead) {
+        Ship::isDead = isDead;
+    }
+
+    void setHealth(int health) {
+        Ship::health = health;
     }
 
 // Move the ship with keyboard.
@@ -88,6 +109,7 @@ public:
             // if 0.5 sec has passed, shoot
             if(elapsed.asSeconds() >= 0.5){
                 rocketSound.setBuffer(rocket);
+                rocketSound.setVolume(50);
                 rocketSound.play();
                 Missile missile1 {x, y, shipTexture.getSize().x, shipTexture.getSize().y, 2};
                 Missile missile2 {x, y, shipTexture.getSize().x, shipTexture.getSize().y, 10};
@@ -146,7 +168,6 @@ public:
             if (bounding.intersects(lazers[i].getBounding())) {
                 Time hitTime = immuTimer.getElapsedTime();
 
-                cout << "Hit player" << endl;
                 lazers[i].setY(721);
                 if(hitTime.asSeconds() >= immuTime){
                     health -= lazers[i].getType();
@@ -181,18 +202,6 @@ public:
         sprite.setTexture(shipTexture);
         bounding = sprite.getGlobalBounds();
         return sprite;
-    }
-
-    bool isIsDead() const {
-        return isDead;
-    }
-
-    void setIsDead(bool isDead) {
-        Ship::isDead = isDead;
-    }
-
-    void setHealth(int health) {
-        Ship::health = health;
     }
 };
 

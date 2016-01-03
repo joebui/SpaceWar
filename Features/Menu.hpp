@@ -15,7 +15,7 @@ private:
     Text records;
     Text esc;
     int choice;
-    Clock c;
+    Clock time;
     Font font;
     Font font1;
 
@@ -26,11 +26,11 @@ public:
         font1.loadFromFile("fonts/Starjedi.ttf");
     }
 
-    void display(RenderWindow &window, bool &g) {
+    void display(RenderWindow &window, int &c) {
         play.setFont(font); // font is a sf::Font
         title.setFont(font1);
 
-        keyboardInput(g);
+        keyboardInput(c);
 
         title.setString("SPACE WAR");
         title.setCharacterSize(60); // in pixels, not points!
@@ -91,12 +91,12 @@ public:
         window.draw(esc);
     }
 
-    void keyboardInput(bool &g) {
-        Time levelElapsed = c.getElapsedTime();
+    void keyboardInput(int &c) {
+        Time levelElapsed = time.getElapsedTime();
         if (Keyboard::isKeyPressed(Keyboard::Up)) {
             if (levelElapsed.asSeconds() >= 0.2) {
                 choice--;
-                c.restart();
+                time.restart();
                 if (choice < 1)
                     choice = 3;
             }
@@ -105,7 +105,7 @@ public:
         if (Keyboard::isKeyPressed(Keyboard::Down)) {
             if (levelElapsed.asSeconds () >= 0.2) {
                 choice++;
-                c.restart();
+                time.restart();
                 if (choice > 3)
                     choice = 1;
             }
@@ -115,12 +115,13 @@ public:
             if (levelElapsed.asSeconds () >= 0.2) {
                 switch (choice) {
                     case 1:
-                        g = true;
+                        c = 1;
                         break;
                     case 2:
+                        c = 2;
                         break;
                     case 3:
-                        exit(EXIT_SUCCESS);
+                        c = 3;
                     default:
                         break;
                 }

@@ -12,24 +12,28 @@
 #include "Monster/MinusHealth.h"
 #include "Features/Menu.hpp"
 #include "Features/GameOver.hpp"
+#include "Features/HighScore.hpp"
 
 using namespace sf;
 
 class Game {
 private:
-    bool isGameOn, changeLevel;
-
+    bool changeLevel, isPaused;
     Ship ship;
-    Clock clock;
+    Clock clock, pause;
     Menu menu;
     GameOver gameOver;
+    HighScore db;
+    int monsterSize;
+    int x;
+    int choice;
+    Music music;
+
     Texture background, monsterTexture1, mobLazer1, monsterTexture2;
     Texture mobLazer2, monsterTexture3, mobLazer3, minusIcon;
     Sprite bg, bgNext;
     vector<Monster> monsters;
     vector<int> spawnMonstersList;
-    int monsterSize;
-    int x;
     vector<Lazer1> weapons;
 
     // Minus Health
@@ -52,12 +56,18 @@ private:
     Text healthText;
     String healthString;
 
+    Text cont;
+
 public:
     Game() {
-        curLevel = 0;
-        isGameOn = false;
+        db.listTopTenScores();
         changeLevel = false;
+        isPaused = false;
+        music.openFromFile("sounds/background.ogg");
+        music.play(); music.setLoop(true);
+
         background.loadFromFile("images/background.jpg");
+        cont.setString("GAME PAUSED\n\nPress Esc to continue\n\nPress R to return to main menu");
 
         monsterTexture1.loadFromFile("images/Monster1 1 HP.png");
         monsterTexture1.setSmooth(true);
@@ -107,73 +117,106 @@ public:
             window.draw(bg);
             window.draw(bgNext);
 
-            if (!isGameOn) {
-                menu.display(window, isGameOn);
-            } else {
-                x--;
+            if (choice == 0) {
+                menu.display(window, choice);
+            } else if (choice == 1) {
                 // Run game until player dies.
-                if (!ship.isIsDead() && isGameOn) {
-                    // Change Level
-                    Time levelElapsed = levelClock.getElapsedTime();
-                    if(levelElapsed.asSeconds () >= 10 || curLevel == 0){
+                if (!ship.isIsDead()) {
+                    Time elap = pause.getElapsedTime();
+                    if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+                        if  (elap.asSeconds() >= 0.5) {
+                            isPaused = !isPaused;
+                            pause.restart();
+                        }
+                    } else if (!isPaused) {
+                        x--;
+                        // Change Level
+                        Time levelElapsed = levelClock.getElapsedTime();
+                        if (levelElapsed.asSeconds() >= 10 || curLevel == 0) {
 
-                        curLevel += 1;
-                        changeLevel = true;
-                        // Print Current level here
-                        levelClock.restart();
-                        setLevelText();
-                    }
+                            curLevel++;
+                            changeLevel = true;
+                            // Print Current level here
+                            levelClock.restart();
+                            setLevelText();
+                        }
 
-                    // Draw Level String
-                    window.draw(levelText);
+                        // Draw Level String
+                        window.draw(levelText);
 
-                    // Draw Score String
-                    setScoreText();
-                    window.draw(scoreText);
+                        // Draw Score String
+                        setScoreText();
+                        window.draw(scoreText);
 
-                    // Draw Health String
-                    setHealthText();
-                    window.draw(healthText);
+                        // Draw Health String
+                        setHealthText();
+                        window.draw(healthText);
 
-                    // check for spawnMonster vector size
-                    if(spawnMonstersList.size() == 0 || changeLevel){
-                        level.addMonster(spawnMonstersList, curLevel);
-                        monsterSize = (int) spawnMonstersList.size();
-                        changeLevel = false;
-                    }
+                        // check for spawnMonster vector size
+                        if (spawnMonstersList.size() == 0 || changeLevel) {
+                            level.addMonster(spawnMonstersList, curLevel);
+                            monsterSize = (int) spawnMonstersList.size();
+                            changeLevel = false;
+                        }
 
-                    ship.controlMovement(window);
-                    window.draw(ship.getSprite());
-                    // Spawn new monster.
+                        ship.controlMovement(window);
+                        window.draw(ship.getSprite());
+                        // Spawn new monster.
 
-                    if(spawnMonstersList.size() != 0 && monsters.size() <= 15){
-                        spawnMonsters(monsters, window, spawnMonstersList.at(spawnMonstersList.size() -1 ));
-                        spawnMonstersList.pop_back();
-                    }
+                        if (spawnMonstersList.size() != 0 && monsters.size() <= 20) {
+                            spawnMonsters(monsters, window, spawnMonstersList.at(spawnMonstersList.size() - 1));
+                            spawnMonstersList.pop_back();
+                        }
 
-                    drawShipAndBullet(window);
+                        drawShipAndBullet(window);
 
-                    // check Shield
-                    if(ship.isShieldUp()){
-                        ship.checkLazerShieldCollision(weapons);
-                        window.draw(ship.getShield().getSprite());
-                        ship.turnShieldOff();
-                    }
+                        // check Shield
+                        if (ship.isShieldUp()) {
+                            ship.checkLazerShieldCollision(weapons);
+                            window.draw(ship.getShield().getSprite());
+                            ship.turnShieldOff();
+                        }
 
-                    // Check missile collion with monsters.
-                    ship.checkBulletMonsterCollision(monsters, minusList);
-                    ship.checkLazerPlayerCollision(weapons);
+                        // Check missile collion with monsters.
+                        ship.checkBulletMonsterCollision(monsters, minusList);
+                        ship.checkLazerPlayerCollision(weapons);
 
-                    //Show Hit Icon
-                    for (unsigned int i = 0; i < minusList.size(); ++i) {
-                        if (minusList[i].getY() > 720) {
-                            minusList.erase(minusList.begin() + i);
-                        } else {
-                            minusList[i].move();
-                            window.draw(minusList[i].getSprite(minusIcon));
-                            minusList[i].checkTimer();
+                        //Show Hit Icon
+                        for (unsigned int i = 0; i < minusList.size(); ++i) {
+                            if (minusList[i].getY() > 720) {
+                                minusList.erase(minusList.begin() + i);
+                            } else {
+                                minusList[i].move();
+                                window.draw(minusList[i].getSprite(minusIcon));
+                                minusList[i].checkTimer();
+                            }
+                        }
+                    } else {
+                        cont.setFont(font);
+                        cont.setCharacterSize(50); // in pixels, not points!
+                        cont.setColor(sf::Color::Green);
+                        cont.setStyle(sf::Text::Bold);
+                        auto textRect = cont.getLocalBounds();
+                        cont.setOrigin(textRect.left + textRect.width/2.0f,
+                                      textRect.top  + textRect.height/2.0f);
+                        cont.setPosition(sf::Vector2f(1024/2.0f,720/2.0f));
+                        window.draw(cont);
+
+                        if (Keyboard::isKeyPressed(Keyboard::R)) {
+                            monsters.clear();
+                            spawnMonstersList.clear();
+                            weapons.clear();
+                            minusList.clear();
+                            curLevel = 0;
+                            ship.setScore(0);
+                            choice = 0;
+                            ship.getMissiles().clear();
+                            ship.setHealth(100);
+                            ship.setIsDead(false);
+                            isPaused = false;
                         }
                     }
+
                 } else {
                     // Clear the monster, player, bullets.
                     monsters.clear();
@@ -181,13 +224,25 @@ public:
                     weapons.clear();
                     minusList.clear();
 
-                    gameOver.display(window);
+                    gameOver.display(window, curLevel, ship.getScore());
                     if (Keyboard::isKeyPressed(Keyboard::Escape)) {
-                        isGameOn = false;
-                        ship.setHealth(1);
+                        db.saveResult(curLevel, ship.getScore());
+                        db.listTopTenScores();
+
+                        curLevel = 0;
+                        ship.setScore(0);
+                        choice = 0;
+                        ship.setHealth(100);
                         ship.setIsDead(false);
                     }
                 }
+            } else if (choice == 2) {
+                db.print(window);
+                if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+                    choice = 0;
+                }
+            } else {
+                exit(EXIT_SUCCESS);
             }
 
             window.display();

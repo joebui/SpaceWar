@@ -7,6 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/Weapon/Lazer1.hpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Weapon/Weapon.hpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Features/HighScore.hpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Features/Menu.hpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Features/GameOver.hpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Game.hpp" isTestSource="false" />
