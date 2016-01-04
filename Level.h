@@ -17,7 +17,7 @@ public:
         switch(curLevel) {
             case 1:
                 // 5 monster level 1
-                for (int i = 0; i < 15; i++) {
+                for (int i = 0; i < 5; i++) {
                     spawnMonsters.push_back(1);
                 }
 //                spawnMonsters.push_back(3);

@@ -124,10 +124,20 @@ public:
                 window.draw(ship.getSprite());
                 // Spawn new monster.
 
-                if(spawnMonstersList.size() != 0){
+                if(spawnMonstersList.size() != 0 && monsters.size() <= 15){
                     spawnMonsters(monsters, window, spawnMonstersList.at(spawnMonstersList.size() -1 ));
                     spawnMonstersList.pop_back();
                 }
+
+                drawShipAndBullet(window);
+
+                // check Shield
+                if(ship.isShieldUp()){
+                    ship.checkLazerShieldCollision(weapons);
+                    window.draw(ship.getShield().getSprite());
+                    ship.turnShieldOff();
+                }
+
                 // Check missile collion with monsters.
                 ship.checkBulletMonsterCollision(monsters, minusList);
                 ship.checkLazerPlayerCollision(weapons);
@@ -157,10 +167,12 @@ public:
             monsters.push_back(monster);
             clock.restart();
         }
+    }
 
+    void drawShipAndBullet(RenderWindow &window){
         // Remove monster going out of the screen boundary.
         for (int i = 0; i < monsters.size(); ++i) {
-            if (monsters[i].getX() >= 1024) {
+            if (monsters[i].getX() >= 1024 || monsters[i].getX() <= -1) {
                 monsters.erase(monsters.begin() + i);
             } else {
                 if(monsters[i].getType() !=3){

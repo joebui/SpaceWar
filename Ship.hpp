@@ -6,6 +6,7 @@
 #include "Weapon/Missile.hpp"
 #include "Monster/Monster.hpp"
 #include "Monster/MinusHealth.h"
+#include "Weapon/Shield.h"
 
 using namespace sf;
 using namespace std;
@@ -23,6 +24,9 @@ private:
     int score = 0;
     int health = 100;
     Clock immuTimer;
+    bool shieldUp;
+    Shield shield;
+    float immuTime = 0.5;
 public:
     Ship() {
         shipTexture.loadFromFile("Spaceship.png");
@@ -37,6 +41,7 @@ public:
         y = 630;
         isDead = false;
         sprite.setPosition(x, y);
+        shieldUp = false;
     }
 
 
@@ -50,6 +55,14 @@ public:
 
     int getHealth() const {
         return health;
+    }
+
+    Shield &getShield() {
+        return shield;
+    }
+
+    bool isShieldUp() const {
+        return shieldUp;
     }
 
 // Move the ship with keyboard.
@@ -79,6 +92,10 @@ public:
             x = 924;
         else if (x < 0)
             x = 0;
+
+        if(shieldUp){
+            shield.updateShield(x,y);
+        }
 
         sprite.setPosition(x, y);
     }
@@ -121,14 +138,31 @@ public:
 
                 cout << "Hit player" << endl;
                 lazers[i].setY(721);
-                if(hitTime.asSeconds() >= 1){
+                if(hitTime.asSeconds() >= immuTime){
                     health -= lazers[i].getType();
                     if(health <= 0){
                         isDead = true;
                     }
                     immuTimer.restart();
+                    shieldUp = true;
                 }
             }
+        }
+    }
+
+    void checkLazerShieldCollision(vector<Lazer1> &lazers) {
+        // Check lazer collision with ship.
+        for (int i = 0; i < lazers.size(); ++i) {
+            if (shield.checkIntersection(lazers[i].getBounding())) {
+                lazers[i].setY(721);
+            }
+        }
+    }
+
+    void turnShieldOff(){
+        Time hitTime = immuTimer.getElapsedTime();
+        if(hitTime.asSeconds() >= immuTime){
+            shieldUp = false;
         }
     }
 
