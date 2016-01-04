@@ -13,6 +13,7 @@ private:
     Text title;
     Text play;
     Text records;
+    Text howto;
     Text esc;
     int choice;
     Clock time;
@@ -67,12 +68,28 @@ public:
         textRect = records.getLocalBounds();
         records.setOrigin(textRect.left + textRect.width/2.0f,
                         textRect.top  + textRect.height/2.0f);
-        records.setPosition(sf::Vector2f(1024/2.0f,720/1.8f));
+        records.setPosition(sf::Vector2f(1024/2.0f,720/2.2f));
+
+        /////////////////////
+        howto.setFont(font); // font is a sf::Font
+
+        if (choice == 3)
+            howto.setString("> How-to <");
+        else
+            howto.setString("How-to");
+
+        howto.setCharacterSize(30); // in pixels, not points!
+        howto.setColor(sf::Color::Green);
+        howto.setStyle(sf::Text::Bold);
+        textRect = howto.getLocalBounds();
+        howto.setOrigin(textRect.left + textRect.width/2.0f,
+                          textRect.top  + textRect.height/2.0f);
+        howto.setPosition(sf::Vector2f(1024/2.0f,720/1.5f));
 
         /////////////////////
         esc.setFont(font); // font is a sf::Font
 
-        if (choice == 3)
+        if (choice == 4)
             esc.setString("> Exit <");
         else
             esc.setString("Exit");
@@ -88,6 +105,7 @@ public:
         window.draw(title);
         window.draw(play);
         window.draw(records);
+        window.draw(howto);
         window.draw(esc);
     }
 
@@ -98,7 +116,7 @@ public:
                 choice--;
                 time.restart();
                 if (choice < 1)
-                    choice = 3;
+                    choice = 4;
             }
         }
 
@@ -106,7 +124,7 @@ public:
             if (levelElapsed.asSeconds () >= 0.2) {
                 choice++;
                 time.restart();
-                if (choice > 3)
+                if (choice > 4)
                     choice = 1;
             }
         }
@@ -122,6 +140,10 @@ public:
                         break;
                     case 3:
                         c = 3;
+                        break;
+                    case 4:
+                        c = 4;
+                        break;
                     default:
                         break;
                 }

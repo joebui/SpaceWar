@@ -13,6 +13,7 @@
 #include "Features/Menu.hpp"
 #include "Features/GameOver.hpp"
 #include "Features/HighScore.hpp"
+#include "Features/HowTo.hpp"
 
 using namespace sf;
 
@@ -22,6 +23,7 @@ private:
     Ship ship;
     Clock clock, pause;
     Menu menu;
+    HowTo howTo;
     GameOver gameOver;
     HighScore db;
     int monsterSize;
@@ -241,9 +243,12 @@ public:
                 if (Keyboard::isKeyPressed(Keyboard::Escape)) {
                     choice = 0;
                 }
-            } else {
-                exit(EXIT_SUCCESS);
-            }
+            } else if (choice == 3) {
+                howTo.display(window);
+                if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+                    choice = 0;
+                }
+            } else { exit(EXIT_SUCCESS); }
 
             window.display();
         }

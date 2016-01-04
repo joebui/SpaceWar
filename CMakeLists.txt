@@ -10,5 +10,5 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -framework sfml-window -frame
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
-set(SOURCE_FILES main.cpp Ship.hpp Monster/Monster.hpp Weapon/Missile.hpp Game.hpp Weapon/Lazer1.hpp Weapon/Weapon.hpp Level.h Features/Menu.hpp Features/GameOver.hpp Features/HighScore.hpp Features/HighScore.hpp)
+set(SOURCE_FILES main.cpp Ship.hpp Monster/Monster.hpp Weapon/Missile.hpp Game.hpp Weapon/Lazer1.hpp Weapon/Weapon.hpp Level.h Features/Menu.hpp Features/GameOver.hpp Features/HighScore.hpp Features/HighScore.hpp Features/HowTo.hpp)
 add_executable(space-war ${SOURCE_FILES})
