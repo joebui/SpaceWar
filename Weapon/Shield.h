@@ -16,9 +16,10 @@ protected:
     Sprite sprite;
     FloatRect bounding;
     int x, y;
+
 public:
     Shield(){
-        shieldIcon.loadFromFile("Shield.png");
+        shieldIcon.loadFromFile("images/Shield.png");
         shieldIcon.setSmooth(true);
         sprite.setTexture(shieldIcon);
         bounding = sprite.getGlobalBounds();

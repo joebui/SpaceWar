@@ -2,6 +2,7 @@
 #define COSC2131_PROJECT_S3445846_S3372771_MONSTER_HPP
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <thread>
 #include "../Weapon/Lazer1.hpp"
 #include "../Ship.hpp"
@@ -26,7 +27,7 @@ private:
 
 public:
     Monster() {
-        texture.loadFromFile("lazer1.png");
+        texture.loadFromFile("images/lazer1.png");
         texture.setSmooth(true);
         x = 0;
         y = rand() % 300;
@@ -41,19 +42,19 @@ public:
     Monster(int type): type{type}{
         switch (type){
             case 1:
-                texture.loadFromFile("lazer1.png");
+                texture.loadFromFile("images/lazer1.png");
                 texture.setSmooth(true);
                 health = 1;
                 score = 1;
                 break;
             case 2:
-                texture.loadFromFile("lazer2.png");
+                texture.loadFromFile("images/lazer2.png");
                 texture.setSmooth(true);
                 health = 2;
                 score = 3;
                 break;
             case 3:
-                texture.loadFromFile("lazer3.png");
+                texture.loadFromFile("images/lazer3.png");
                 texture.setSmooth(true);
                 health = 3;
                 score = 10;

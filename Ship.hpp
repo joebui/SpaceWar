@@ -2,6 +2,7 @@
 #define COSC2131_PROJECT_S3445846_S3372771_SHIP_HPP
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include "Weapon/Missile.hpp"
 #include "Monster/Monster.hpp"
@@ -21,21 +22,29 @@ private:
     int x, y;
     bool isDead;
     Clock clock;
-    int score = 0;
-    int health = 100;
+    int score;
+    int health;
     Clock immuTimer;
     bool shieldUp;
     Shield shield;
     float immuTime = 0.5;
+
+    SoundBuffer rocket;
+    Sound rocketSound;
+
 public:
     Ship() {
-        shipTexture.loadFromFile("Spaceship.png");
+        score = 0;
+        health = 100;
+        shipTexture.loadFromFile("images/Spaceship.png");
         shipTexture.setSmooth(true);
-        missileTexture.loadFromFile("missile.png");
+        missileTexture.loadFromFile("images/missile.png");
         missileTexture.setSmooth(true);
 
         sprite.setTexture(shipTexture);
         bounding = sprite.getGlobalBounds();
+
+        rocket.loadFromFile("sounds/rocket.wav");
 
         x = 1024 / 2;
         y = 630;
@@ -44,6 +53,9 @@ public:
         shieldUp = false;
     }
 
+    vector<Missile> &getMissiles() {
+        return missiles;
+    }
 
     int getX() const {
         return x;
@@ -51,6 +63,10 @@ public:
 
     int getScore() const {
         return score;
+    }
+
+    void setScore(int score) {
+        Ship::score = score;
     }
 
     int getHealth() const {
@@ -63,6 +79,18 @@ public:
 
     bool isShieldUp() const {
         return shieldUp;
+    }
+
+    bool isIsDead() const {
+        return isDead;
+    }
+
+    void setIsDead(bool isDead) {
+        Ship::isDead = isDead;
+    }
+
+    void setHealth(int health) {
+        Ship::health = health;
     }
 
 // Move the ship with keyboard.
@@ -80,8 +108,12 @@ public:
             Time elapsed = clock.getElapsedTime();
             // if 0.5 sec has passed, shoot
             if(elapsed.asSeconds() >= 0.5){
-                Missile missile {x, y, shipTexture.getSize().x, shipTexture.getSize().y};
-                missiles.push_back(missile);
+                rocketSound.setBuffer(rocket);
+                rocketSound.setVolume(50);
+                rocketSound.play();
+                Missile missile1 {x, y, shipTexture.getSize().x, shipTexture.getSize().y, 2};
+                Missile missile2 {x, y, shipTexture.getSize().x, shipTexture.getSize().y, 10};
+                missiles.push_back(missile1); missiles.push_back(missile2);
                 clock.restart();
             }
         }
@@ -136,11 +168,11 @@ public:
             if (bounding.intersects(lazers[i].getBounding())) {
                 Time hitTime = immuTimer.getElapsedTime();
 
-                cout << "Hit player" << endl;
                 lazers[i].setY(721);
                 if(hitTime.asSeconds() >= immuTime){
                     health -= lazers[i].getType();
                     if(health <= 0){
+                        missiles.clear();
                         isDead = true;
                     }
                     immuTimer.restart();
@@ -170,10 +202,6 @@ public:
         sprite.setTexture(shipTexture);
         bounding = sprite.getGlobalBounds();
         return sprite;
-    }
-
-    bool isIsDead() const {
-        return isDead;
     }
 };
 
