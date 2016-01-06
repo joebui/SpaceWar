@@ -8,6 +8,7 @@
 #include "Monster/Monster.hpp"
 #include "Monster/MinusHealth.h"
 #include "Weapon/Shield.h"
+#include "Weapon/GiantLazer.h"
 
 using namespace sf;
 using namespace std;
@@ -24,10 +25,20 @@ private:
     Clock clock;
     int score;
     int health;
-    Clock immuTimer;
+
+    // Shield
     bool shieldUp;
     Shield shield;
     float immuTime = 0.5;
+    Clock immuTimer;
+
+    // Giant Lazer
+    bool canShootLazer = false;
+    bool giantLazerUp;
+    GiantLazer giantLazer;
+    float fireTime = 1;
+    Clock firingTimer;
+    int nextScore = 1;
 
     SoundBuffer rocket;
     Sound rocketSound;
@@ -85,6 +96,14 @@ public:
         return isDead;
     }
 
+    bool isGiantLazerUp() const {
+        return giantLazerUp;
+    }
+
+    GiantLazer &getGiantLazer() {
+        return giantLazer;
+    }
+
     void setIsDead(bool isDead) {
         Ship::isDead = isDead;
     }
@@ -118,6 +137,12 @@ public:
             }
         }
 
+        if (Keyboard::isKeyPressed(Keyboard::C)) {
+            if(canShootLazer){
+                fireGiantLazer();
+            }
+        }
+
         fire(window);
 
         if (x > 924)
@@ -127,6 +152,10 @@ public:
 
         if(shieldUp){
             shield.updateShield(x,y);
+        }
+
+        if(giantLazerUp){
+            giantLazer.updateGiantLazer(x,y);
         }
 
         sprite.setPosition(x, y);
@@ -155,11 +184,21 @@ public:
                     if (monsters[i].getHealth() <= 0){
                         monsters[i].setX(1024);
                         score += monsters[i].getScore();
+                        if(score >= nextScore * 100){
+                            canShootLazer = true;
+                            nextScore++;
+                        }
                     }
                         missiles[j].setY(-10);
                 }
             }
         }
+    }
+
+    void fireGiantLazer(){
+        giantLazerUp = true;
+        canShootLazer = false;
+        firingTimer.restart();
     }
 
     void checkLazerPlayerCollision(vector<Lazer1> &lazers) {
@@ -191,10 +230,39 @@ public:
         }
     }
 
+    void checkGiantLazerCollision(vector<Lazer1> &lazers, vector<Monster> &monsters){
+        for (int i = 0; i < monsters.size(); ++i) {
+                if (monsters[i].checkIntersection(giantLazer.getBounding())) {
+                    monsters[i].reduceHealth();
+                    if (monsters[i].getHealth() <= 0){
+                        monsters[i].setX(1024);
+                        score += monsters[i].getScore();
+                        if(score >= nextScore * 100){
+                            canShootLazer = true;
+                            nextScore++;
+                        }
+                    }
+                }
+        }
+
+        for (int i = 0; i < lazers.size(); ++i) {
+            if (giantLazer.checkIntersection(lazers[i].getBounding())) {
+                lazers[i].setY(721);
+            }
+        }
+    }
+
     void turnShieldOff(){
         Time hitTime = immuTimer.getElapsedTime();
         if(hitTime.asSeconds() >= immuTime){
             shieldUp = false;
+        }
+    }
+
+    void turnLazerOff(){
+        Time hitTime = firingTimer.getElapsedTime();
+        if(hitTime.asSeconds() >= fireTime){
+            giantLazerUp = false;
         }
     }
 

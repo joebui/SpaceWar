@@ -26,9 +26,9 @@ private:
     HowTo howTo;
     GameOver gameOver;
     HighScore db;
-    int monsterSize;
-    int x;
-    int choice;
+    int monsterSize = 0;
+    int x = 0;
+    int choice = 0;
     Music music;
 
     Texture background, monsterTexture1, mobLazer1, monsterTexture2;
@@ -44,7 +44,7 @@ private:
     // Level
     Clock levelClock;
     Level level;
-    int curLevel;
+    int curLevel = 0;
 
     Text levelText;
     String levelString;
@@ -94,18 +94,21 @@ public:
 
     void run() {
         RenderWindow window(VideoMode(1024, 720), "Space War", Style::Close, ContextSettings(32));
+        window.setFramerateLimit(60);
         window.setVerticalSyncEnabled(true);
         glEnable(GL_TEXTURE_2D);
-
         while (window.isOpen()) {
             Event event;
             while (window.pollEvent(event)) {
-                if (event.type == Event::Closed)
+                if (event.type == Event::Closed){
                     window.close();
-                else if (event.type == sf::Event::Resized)
+                }
+                else if (event.type == sf::Event::Resized){
                     // adjust the viewport when the window is resized
                     glViewport(0, 0, event.size.width, event.size.height);
+                }
             }
+
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             if (x < 0)
@@ -177,6 +180,13 @@ public:
                             ship.checkLazerShieldCollision(weapons);
                             window.draw(ship.getShield().getSprite());
                             ship.turnShieldOff();
+                        }
+
+                        // check GiantLazer
+                        if (ship.isGiantLazerUp()) {
+                            ship.checkGiantLazerCollision(weapons, monsters);
+                            window.draw(ship.getGiantLazer().getSprite());
+                            ship.turnLazerOff();
                         }
 
                         // Check missile collion with monsters.
