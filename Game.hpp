@@ -137,7 +137,7 @@ public:
                         x--;
                         // Change Level
                         Time levelElapsed = levelClock.getElapsedTime();
-                        if (levelElapsed.asSeconds() >= 10 || curLevel == 0) {
+                        if (levelElapsed.asSeconds() >= 60 || curLevel == 0) {
 
                             curLevel++;
                             changeLevel = true;
@@ -166,8 +166,8 @@ public:
 
                         ship.controlMovement(window);
                         window.draw(ship.getSprite());
-                        // Spawn new monster.
 
+                        // Spawn new monster.
                         if (spawnMonstersList.size() != 0 && monsters.size() <= 20) {
                             spawnMonsters(monsters, window, spawnMonstersList.at(spawnMonstersList.size() - 1));
                             spawnMonstersList.pop_back();
@@ -291,6 +291,7 @@ public:
                 }
                 monsters[i].fireBullet(weapons);
 
+                // Assign texture for monster
                 switch (monsters[i].getType()){
                     case 1:
                         window.draw(monsters[i].getSprite(monsterTexture1));
@@ -312,6 +313,7 @@ public:
             } else {
                 weapons[i].fire();
 
+                // Assign texture for monster's weapon
                 switch (weapons[i].getType()){
                     case 1:
                         window.draw(weapons[i].getSprite(mobLazer1));

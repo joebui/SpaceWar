@@ -36,7 +36,7 @@ private:
     bool canShootLazer = false;
     bool giantLazerUp;
     GiantLazer giantLazer;
-    float fireTime = 1;
+    float fireTime = 0.5;
     Clock firingTimer;
     int nextScore = 1;
 
@@ -137,6 +137,7 @@ public:
             }
         }
 
+        // Fire Lazer
         if (Keyboard::isKeyPressed(Keyboard::C)) {
             if(canShootLazer){
                 fireGiantLazer();
@@ -150,10 +151,12 @@ public:
         else if (x < 0)
             x = 0;
 
+        // Update Shield's position
         if(shieldUp){
             shield.updateShield(x,y);
         }
 
+        // Update Lazer's position
         if(giantLazerUp){
             giantLazer.updateGiantLazer(x,y);
         }
@@ -184,6 +187,8 @@ public:
                     if (monsters[i].getHealth() <= 0){
                         monsters[i].setX(1024);
                         score += monsters[i].getScore();
+
+                        // if score reach 100, 200, 300... Player can shoot Lazer 1
                         if(score >= nextScore * 100){
                             canShootLazer = true;
                             nextScore++;
@@ -195,6 +200,7 @@ public:
         }
     }
 
+    // Activate Lazer
     void fireGiantLazer(){
         giantLazerUp = true;
         canShootLazer = false;
@@ -221,6 +227,7 @@ public:
         }
     }
 
+    // Remove bullet that hit shield
     void checkLazerShieldCollision(vector<Lazer1> &lazers) {
         // Check lazer collision with ship.
         for (int i = 0; i < lazers.size(); ++i) {
@@ -230,13 +237,16 @@ public:
         }
     }
 
+    // Remove monster and bullet that hit Lazer, add Point based on Monster removed
     void checkGiantLazerCollision(vector<Lazer1> &lazers, vector<Monster> &monsters){
+        // Check monster
         for (int i = 0; i < monsters.size(); ++i) {
                 if (monsters[i].checkIntersection(giantLazer.getBounding())) {
                     monsters[i].reduceHealth();
                     if (monsters[i].getHealth() <= 0){
                         monsters[i].setX(1024);
                         score += monsters[i].getScore();
+                        // if score reach 100, 200, 300... Player can shoot Lazer 1
                         if(score >= nextScore * 100){
                             canShootLazer = true;
                             nextScore++;
@@ -245,6 +255,7 @@ public:
                 }
         }
 
+        // Check Lazer
         for (int i = 0; i < lazers.size(); ++i) {
             if (giantLazer.checkIntersection(lazers[i].getBounding())) {
                 lazers[i].setY(721);

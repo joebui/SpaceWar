@@ -26,8 +26,8 @@ public:
     }
 
     void updateGiantLazer(int xShip, int yShip){
-        x = xShip - 5;
-        y = 500;
+        x = xShip + 13;
+        y = 0;
         sprite.setPosition(x, y);
     }
 
