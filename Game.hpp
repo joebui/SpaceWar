@@ -30,6 +30,7 @@ private:
     int x = 0;
     int choice = 0;
     Music music;
+    bool spawned = false;
 
     Texture background, monsterTexture1, mobLazer1, monsterTexture2;
     Texture mobLazer2, monsterTexture3, mobLazer3, minusIcon;
@@ -137,7 +138,7 @@ public:
                         x--;
                         // Change Level
                         Time levelElapsed = levelClock.getElapsedTime();
-                        if (levelElapsed.asSeconds() >= 60 || curLevel == 0) {
+                        if (levelElapsed.asSeconds() >= 30 || curLevel == 0) {
 
                             curLevel++;
                             changeLevel = true;
@@ -170,7 +171,10 @@ public:
                         // Spawn new monster.
                         if (spawnMonstersList.size() != 0 && monsters.size() <= 20) {
                             spawnMonsters(monsters, window, spawnMonstersList.at(spawnMonstersList.size() - 1));
-                            spawnMonstersList.pop_back();
+                            // if monster is spawned then remove it from vector
+                            if(spawned){
+                                spawnMonstersList.pop_back();
+                            }
                         }
 
                         drawShipAndBullet(window);
@@ -274,6 +278,9 @@ public:
             Monster monster(type);
             monsters.push_back(monster);
             clock.restart();
+            spawned = true;
+        } else {
+            spawned = false;
         }
     }
 

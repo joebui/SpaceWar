@@ -17,6 +17,7 @@ public:
         font.loadFromFile("fonts/OpenSans-Bold.ttf");
     }
 
+    // Display the game guide for pplayer.
     void display(RenderWindow &window) {
         title.setFont(font);
 

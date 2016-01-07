@@ -27,6 +27,7 @@ public:
         font1.loadFromFile("fonts/Starjedi.ttf");
     }
 
+    // Display the main menu.
     void display(RenderWindow &window, int &c) {
         play.setFont(font); // font is a sf::Font
         title.setFont(font1);
@@ -111,6 +112,7 @@ public:
 
     void keyboardInput(int &c) {
         Time levelElapsed = time.getElapsedTime();
+        // Move the arrows up in the option list.
         if (Keyboard::isKeyPressed(Keyboard::Up)) {
             if (levelElapsed.asSeconds() >= 0.2) {
                 choice--;
@@ -120,6 +122,7 @@ public:
             }
         }
 
+        // Move the arrows down in the option list.
         if (Keyboard::isKeyPressed(Keyboard::Down)) {
             if (levelElapsed.asSeconds () >= 0.2) {
                 choice++;
@@ -129,6 +132,7 @@ public:
             }
         }
 
+        // Press Enter to make your choice.
         if (Keyboard::isKeyPressed(Keyboard::Return)) {
             if (levelElapsed.asSeconds () >= 0.2) {
                 switch (choice) {

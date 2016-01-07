@@ -25,6 +25,7 @@ public:
 
 public:
     HighScore() {
+        // Open SQLite database file.
         rc = sqlite3_open("scores.db", &db);
         if (rc) {
             fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
@@ -39,6 +40,7 @@ public:
     }
 
     void saveResult(int level, int score) {
+        // Insert the new achievement to database.
         string sql = "INSERT INTO achievement (level, score) VALUES (" + to_string(level) + "," + to_string(score) + ");";
         rc = sqlite3_exec(db, sql.c_str(), callback, 0, &errorMsg);
         if (rc != SQLITE_OK) {
@@ -51,6 +53,7 @@ public:
 
     void listTopTenScores() {
         scores.clear();
+        // Get top 10 achievements based on the level player's achieved.
         string sql = "SELECT * FROM achievement ORDER BY level DESC LIMIT 10";
         rc = sqlite3_exec(db, sql.c_str(), callback, 0, &errorMsg);
 
@@ -62,6 +65,7 @@ public:
         }
     }
 
+    // This static function is used by SQLite commands to list the achievements.
     static int callback(void *NotUsed, int argc, char **argv, char **azColName){
         string row;
         row.append(argv[1]);
@@ -72,6 +76,7 @@ public:
         return 0;
     }
 
+    // Print the achievements on the screen.
     void print(RenderWindow &window) {
         title.setFont(font1);
         title.setCharacterSize(60); // in pixels, not points!
