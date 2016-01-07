@@ -31,7 +31,9 @@ public:
         howTo.setFont(font);
         howTo.setString("Use LEFT and RIGHT arrow to move the ship.\n"
                                 "Hold SPACE to fire.\n"
-                                "You can press Esc at anytime to pause the game.\n\n"
+                                "You can press Esc at anytime to pause the game.\n"
+                                "When your score reach 100, 200, 300 or, ... you can \n"
+                                "press C to fire a big lazer beam for only once.\n\n"
                                 "The game will be endless until your health reaches 0.");
         howTo.setStyle(sf::Text::Bold);
         textRect = howTo.getLocalBounds();
